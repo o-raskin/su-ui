@@ -10,6 +10,7 @@ export interface ISkill {
 }
 
 export class SkillDTO implements ISkill{
+    id?: number;
     description: string = '';
     end_date: Date = new Date();
     name: string = '';

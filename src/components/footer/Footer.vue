@@ -1,13 +1,11 @@
 <template>
-    <v-container>
-        <v-footer app>
-            <v-col class="text-center overline" padless cols="12">
-                <strong>
-                    <span class="font-weight-light">{{owner}} </span>
-                </strong>
-            </v-col>
-        </v-footer>
-    </v-container>
+    <v-footer app>
+        <v-col class="text-center overline" padless cols="12">
+            <strong>
+                <span class="font-weight-light">{{owner}} </span>
+            </strong>
+        </v-col>
+    </v-footer>
 </template>
 
 <script lang="ts">

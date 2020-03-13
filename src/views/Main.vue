@@ -1,5 +1,5 @@
 <template>
-    <v-app>
+    <v-container>
 
         <Header/>
 
@@ -17,13 +17,13 @@
         </v-navigation-drawer>
 
 
-        <v-content class="darken-2">
+        <v-content>
             <router-view/>
         </v-content>
 
-        <Footer class="grey darken-5"/>
+        <Footer/>
 
-    </v-app>
+    </v-container>
 </template>
 
 <script lang="ts">

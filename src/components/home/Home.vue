@@ -3,9 +3,9 @@
         <v-layout text-center wrap>
             <v-flex>
 
-                <!--    Core    -->
+                <!--    Content    -->
 
-                <v-btn>HOME PAGE CONTENT HERE!</v-btn>
+                <v-btn @click="setStatus">CLICK ME!</v-btn>
 
             </v-flex>
         </v-layout>
@@ -15,9 +15,17 @@
 <script lang="ts">
     import Component from "vue-class-component";
     import Vue from "vue";
+    import StatusReport from "@/components/status-report/StatusReport.vue";
 
-    @Component
+    @Component({
+        components: {
+            StatusReport
+        },
+    })
     export default class Home extends Vue {
 
+        setStatus() {
+            this.$bus.$emit('status', {text: 'MY TEXT', color: 'error'})
+        }
     }
 </script>

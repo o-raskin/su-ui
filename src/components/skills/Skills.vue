@@ -1,36 +1,71 @@
 <template>
-    <v-container fluid align="center" justify="center" ml-0 mr-0>
-        <v-layout text-center wrap>
-            <v-flex>
+    <v-container>
+        <v-row>
+            <v-col>
+                <v-treeview
+                        v-model="selection"
+                        :items="skills"
+                        :selection-type="selectionType"
+                        selectable
+                        activatable
+                        hoverable="true"
+                        v-on:update:active="setActive"
+                />
+            </v-col>
+            <v-divider vertical></v-divider>
+            <v-col class="pa-6" cols="6">
+                <template v-if="activeSkill === null">
+                    <p class="text--disabled">
+                        Choose skill...
+                    </p>
+                </template>
+                <template v-else>
+                    <SkillCard :skill="activeSkill"/>
+                </template>
+            </v-col>
+        </v-row>
 
-                <!--    Core    -->
-                <v-list>
-                    <v-list-item :key="index" v-for="(skill, index) in skills">
-                        <v-list-item-title>
-                            {{skill.name}}
-                        </v-list-item-title>
-                    </v-list-item>
-                </v-list>
-
-            </v-flex>
-        </v-layout>
     </v-container>
 </template>
 
 
-<script lang="ts">
-    import Component from "vue-class-component";
+<script>
     import {SkillApi} from "@/api/SkillAPI";
-    import Vue from "vue";
-    import {SkillDTO} from "@/models/Skill";
+    import SkillCard from './SkillCard';
 
-    @Component
-    export default class Skills extends Vue {
+    export default {
+        name: 'Skills',
+        components: {
+            SkillCard
+        },
+        data() {
+            return {
+                activeSkill: null,
+                skills: [],
+                selection: [],
+                selectionType: 'leaf',
+            }
+        },
+        methods: {
+            setActive(id) {
+                debugger
+                if (id.length === 0 || id[0] === null) {
+                    this.activeSkill = null
+                } else {
+                    let flatSkillArray = this.skills.flat(Infinity);
+                    debugger
+                    for (let skill of flatSkillArray) {
+                        if (skill.id === id[0]) {
+                            this.activeSkill = skill
+                        }
+                    }
+                }
+            }
+        },
 
-        private skills: SkillDTO[] = [];
-
-        async mounted(): Promise<void> {
+        async mounted() {
             this.skills = await SkillApi.getAllSkills();
         }
+
     }
 </script>
