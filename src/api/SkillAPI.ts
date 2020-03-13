@@ -5,7 +5,7 @@ export abstract class SkillApi {
 
     private static axios = Axios.create();
 
-    static async getAllSkills(): Promise<SkillDTO[]>{
+    static async getAll(): Promise<SkillDTO[]>{
 
         const config = {
             headers: {
