@@ -1,11 +1,11 @@
 import Axios from "axios";
-import {SkillDTO} from "@/models/Skill";
+import {ISkill} from "@/models/Skill";
 
 export abstract class SkillApi {
 
     private static axios = Axios.create();
 
-    static async getAll(): Promise<SkillDTO[]>{
+    static async getAll(): Promise<ISkill[]>{
 
         const config = {
             headers: {
@@ -15,6 +15,8 @@ export abstract class SkillApi {
         };
 
         let response = await this.axios.get('http://localhost:8099/employee/skills', config);
+        debugger
         return response.data;
     }
+
 }

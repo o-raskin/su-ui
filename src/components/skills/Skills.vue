@@ -1,5 +1,26 @@
 <template>
     <v-container>
+        <v-toolbar dense short flat>
+
+            <v-toolbar-title>Skills</v-toolbar-title>
+
+            <v-spacer></v-spacer>
+
+            <v-btn icon>
+                <v-icon>mdi-plus</v-icon>
+            </v-btn>
+
+            <v-btn icon>
+                <v-icon>mdi-trash-can-outline</v-icon>
+            </v-btn>
+
+            <v-btn icon>
+                <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+        </v-toolbar>
+
+        <v-divider/>
+
         <v-row>
             <v-col>
                 <v-card class="mx-auto" outlined>
@@ -18,7 +39,7 @@
                                 v-model="caseSensitive"
                                 dark
                                 hide-details
-                                label="Case sensitive search"
+                                label="case sensitive"
                         ></v-checkbox>
                     </v-sheet>
                     <v-treeview
@@ -34,7 +55,7 @@
                     />
                 </v-card>
             </v-col>
-            <v-divider vertical></v-divider>
+            <v-divider vertical/>
             <v-col>
                 <template v-if="activeSkill === null">
                     <p class="text--disabled">

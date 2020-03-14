@@ -5,7 +5,6 @@
 
         <Sidebar/>
 
-
         <v-content>
             <router-view/>
         </v-content>
@@ -18,7 +17,6 @@
 <script lang="ts">
     import Vue from 'vue';
     import {Component} from 'vue-property-decorator';
-    import Skills from "@/components/skills/Skills.vue";
     import Footer from "@/components/footer/Footer.vue";
     import Header from "@/components/header/Header.vue";
     import Sidebar from "@/components/navigation/Sidebar.vue";
@@ -28,7 +26,6 @@
             Sidebar,
             Header,
             Footer,
-            Skills,
         },
     })
     export default class Main extends Vue {

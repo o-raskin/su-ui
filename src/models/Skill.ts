@@ -1,3 +1,11 @@
+export interface ISuccessCriterion {
+    id?: number;
+    name: string;
+    description: string;
+    finishDate: Date;
+    achieved: boolean;
+}
+
 export interface ISkill {
     id?: number;
     name: string;
@@ -7,15 +15,5 @@ export interface ISkill {
     end_date: Date;
     parent: ISkill;
     children: ISkill[];
-}
-
-export class SkillDTO implements ISkill{
-    id?: number;
-    description: string = '';
-    end_date: Date = new Date();
-    name: string = '';
-    start_date: Date = new Date();
-    status: string = '';
-    parent: any;
-    children: ISkill[] = [];
+    successCriteria: ISuccessCriterion[];
 }

@@ -1,10 +1,10 @@
 <template>
-    <v-footer app>
-        <v-col class="text-center overline" padless cols="12">
+    <v-footer app dark>
+        <div class="mx-auto">
             <strong>
-                <span class="font-weight-light">{{owner}} </span>
+                <span class="overline font-weight-light">{{owner}} </span>
             </strong>
-        </v-col>
+        </div>
     </v-footer>
 </template>
 
