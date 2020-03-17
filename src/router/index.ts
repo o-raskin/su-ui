@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Skills from "@/components/skills/Skills.vue";
+import Skills from "@/components/skills/SkillBoard.vue";
 import Home from '@/components/home/Home.vue';
 
 Vue.use(VueRouter)
@@ -8,11 +8,11 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/skills',
-    name: 'Skills',
+    name: 'SkillBoard',
     component: Skills
   },
   {
-    path: '/',
+    path: '/home',
     name: 'Home',
     component: Home
   }

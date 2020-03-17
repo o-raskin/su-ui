@@ -7,6 +7,9 @@
 
                 <v-btn @click="setStatus">CLICK ME!</v-btn>
 
+                <v-divider/>
+
+                <Login/>
             </v-flex>
         </v-layout>
     </v-container>
@@ -16,9 +19,11 @@
     import Component from "vue-class-component";
     import Vue from "vue";
     import StatusReport from "@/components/status-report/StatusReport.vue";
+    import Login from "@/components/auth/login/Login.vue";
 
     @Component({
         components: {
+            Login,
             StatusReport
         },
     })

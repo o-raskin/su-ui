@@ -1,9 +1,9 @@
 import {ISkill} from "@/models/Skill";
 import AxiosClient from "@/api/AxiosClient";
 
-export abstract class SkillApi {
+export abstract class AuthAPI {
 
-    static async getAll(): Promise<ISkill[]>{
+    static async auth(): Promise<ISkill[]>{
 
         const config = {
             headers: {

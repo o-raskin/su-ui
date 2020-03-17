@@ -2,9 +2,9 @@
     <v-container>
         <v-toolbar dense short flat>
 
-            <v-toolbar-title>Skills</v-toolbar-title>
+            <v-toolbar-title>Skill Board</v-toolbar-title>
 
-            <v-spacer></v-spacer>
+            <v-spacer/>
 
             <v-btn icon>
                 <v-icon>mdi-plus</v-icon>
@@ -78,7 +78,7 @@
     import _ from 'lodash';
 
     export default {
-        name: 'Skills',
+        name: 'SkillBoard',
         components: {
             SkillCard
         },
