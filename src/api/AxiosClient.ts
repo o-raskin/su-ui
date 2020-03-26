@@ -12,6 +12,9 @@ export const AxiosClient = Axios.create({
     withCredentials: true
 })
 
+/**
+ *  If we're know token => user authenticated => use this token for requests
+ */
 AxiosClient.interceptors.request.use(
     config => {
         config.headers.authorization = 'Bearer ' + localStorage.getItem("ACCESS_TOKEN");

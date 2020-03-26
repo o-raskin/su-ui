@@ -3,7 +3,7 @@
 
         <Header/>
 
-        <Sidebar/>
+        <Sidebar v-if="isAuthenticated"/>
 
         <v-content>
             <router-view/>
@@ -30,5 +30,8 @@
     })
     export default class Main extends Vue {
 
+        get isAuthenticated() {
+            return this.$store.state.currentUser.id;
+        }
     };
 </script>

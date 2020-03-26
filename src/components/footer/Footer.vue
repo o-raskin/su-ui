@@ -2,7 +2,7 @@
     <v-footer app dark>
         <div class="mx-auto">
             <strong>
-                <span class="overline font-weight-light">{{owner}} </span>
+                <span class="overline font-weight-light">{{content}} </span>
             </strong>
         </div>
     </v-footer>
@@ -14,6 +14,6 @@
 
     @Component
     export default class Footer extends Vue {
-        owner: string = 'Raskin O.D.';
+        content: string = '2020';
     }
 </script>

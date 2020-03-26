@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Skills from "@/components/skills/SkillBoard.vue";
 import Home from '@/components/home/Home.vue';
+import NotFound from '@/components/common/NotFound.vue';
 import Login from '@/components/auth/login/Login.vue';
 import {store} from '../../store';
 
@@ -37,6 +38,12 @@ export const routes = [
         beforeEnter: ifAuthenticated,
     },
     {
+        path: '/profile/:id',
+        name: 'UserProfile',
+        component: Home,
+        beforeEnter: ifAuthenticated
+    },
+    {
         path: '/login',
         name: 'Login',
         component: Login,
@@ -50,18 +57,14 @@ export const routes = [
     //             //title: 'common.view.500.title'
     //         }
     // },
-    // {
-    //     path: '/404',
-    //     component: NotFound,
-    //     meta: {
-    //         //title: 'common.view.404.title'
-    //     }
-    // },
-    // {
-    //     path: '*',
-    //     redirect: '/404',
-    //     meta: {
-    //       // title: ''
-    //     }
-    // },
+    {
+        path: '/404',
+        component: NotFound,
+        beforeEnter: ifAuthenticated
+    },
+    {
+        path: '*',
+        redirect: '/404',
+        beforeEnter: ifAuthenticated
+    },
 ]

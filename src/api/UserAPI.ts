@@ -1,6 +1,8 @@
 import {AxiosClient} from "@/api/AxiosClient";
+import {AxiosPromise} from "axios";
+import {IUser} from "@/models/User";
 
-export abstract class AuthAPI {
+export abstract class UserAPI {
 
     static async getCurrentUser() {
 
@@ -18,6 +20,10 @@ export abstract class AuthAPI {
 
         let response = await AxiosClient.get("/users/current", config)
         return response.data
+    }
+
+    public static getUserById(id: number) : AxiosPromise<IUser> {
+        return AxiosClient.get<IUser>("/users/" + id);
     }
 
 }

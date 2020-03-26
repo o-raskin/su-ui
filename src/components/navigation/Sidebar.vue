@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer fixed app clipped permanent expand-on-hover>
+    <v-navigation-drawer  dark fixed app clipped permanent expand-on-hover>
         <v-list nav dense>
             <v-list-item @click="gotoPath(item.name)" link :key="index" v-for="(item, index) in items">
                 <v-list-item-icon>

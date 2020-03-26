@@ -13,7 +13,7 @@
         <v-menu v-if="isAuthenticated" bottom left :close-on-content-click="false">
             <template v-slot:activator="{ on }">
                 <v-btn dark icon v-on="on">
-                    <v-avatar size="25">
+                    <v-avatar size="30">
                         <img :src="currentUser.imageUrl">
                     </v-avatar>
                 </v-btn>
@@ -31,35 +31,41 @@
                             <v-list-item-subtitle>{{currentUser.email}}</v-list-item-subtitle>
                         </v-list-item-content>
 
-                        <v-list-item-action>
-                            <v-btn
-                                    :class="fav ? 'red--text' : ''"
-                                    icon
-                                    @click="fav = !fav"
-                            >
-                                <v-icon>mdi-heart</v-icon>
-                            </v-btn>
-                        </v-list-item-action>
                     </v-list-item>
                 </v-list>
 
                 <v-divider></v-divider>
 
-<!--                <v-list>-->
-<!--                    <v-list-item>-->
-<!--                        <v-list-item-action>-->
-<!--                            <v-switch v-model="message" color="purple"></v-switch>-->
-<!--                        </v-list-item-action>-->
-<!--                        <v-list-item-title>Enable messages</v-list-item-title>-->
-<!--                    </v-list-item>-->
+                <v-list>
+                    <v-list-item>
+                        <v-list-item-action>
+                            <v-switch
+                                    v-model="currentUserProfile.visibility"
+                                    v-on:change="updateCurrentUserProfile()"
+                                    color="primary"
+                            >
+                            </v-switch>
+                        </v-list-item-action>
+                        <v-list-item-title v-if="currentUserProfile.visibility">
+                            {{visible_profile_text}}
+                        </v-list-item-title>
+                        <v-list-item-title v-if="!currentUserProfile.visibility">
+                            {{invisible_profile_text}}
+                            <span
+                                    class="caption text-break"
+                                    v-if="!currentUserProfile.visibility">
+                                <br/>{{invisible_profile_subtitle_text}}
+                            </span>
+                        </v-list-item-title>
+                    </v-list-item>
 
-<!--                    <v-list-item>-->
-<!--                        <v-list-item-action>-->
-<!--                            <v-switch v-model="hints" color="purple"></v-switch>-->
-<!--                        </v-list-item-action>-->
-<!--                        <v-list-item-title>Enable hints</v-list-item-title>-->
-<!--                    </v-list-item>-->
-<!--                </v-list>-->
+                    <!--                    <v-list-item>-->
+                    <!--                        <v-list-item-action>-->
+                    <!--                            <v-switch v-model="hints" color="purple"></v-switch>-->
+                    <!--                        </v-list-item-action>-->
+                    <!--                        <v-list-item-title>Enable hints</v-list-item-title>-->
+                    <!--                    </v-list-item>-->
+                </v-list>
 
                 <v-card-actions>
                     <v-btn color="primary" text @click.prevent="logout">LOGOUT</v-btn>
@@ -69,29 +75,43 @@
     </v-app-bar>
 </template>
 
-<script>
-    import Component from "vue-class-component";
-    import Vue from "vue";
+<script lang="ts">
+    import {Component, Vue} from 'vue-property-decorator';
+    import {State} from "vuex-class";
+    import {IProfile} from "@/models/Profile";
+    import {IUser} from "@/models/User";
+    import profileModule from "../../../store/profile-store";
 
-    export default {
-        name: 'Header',
-        data () {
+    @Component({
+        components: {},
+    })
+    export default class Home extends Vue {
+
+        @State((state) => profileModule.state.currentUserProfile)
+        public currentUserProfile!: IProfile;
+
+        @State((state) => state.currentUser)
+        public currentUser!: IUser;
+
+        data() {
             return {
-                main_title: ['Skill', 'Up', 'sys.']
+                main_title: ['Skill', 'Up', 'sys.'],
+                visible_profile_text: 'Visible profile',
+                invisible_profile_text: 'Invisible profile',
+                invisible_profile_subtitle_text: 'Only important and users in your whitelist can see this page',
             }
-        },
-        methods: {
-            logout() {
-                this.$store.dispatch("logout")
-            }
-        },
-        computed: {
-            currentUser() {
-                return this.$store.state.currentUser
-            },
-            isAuthenticated() {
-                return this.$store.state.currentUser.id;
-            }
-        },
+        }
+
+        public updateCurrentUserProfile() {
+            this.$store.dispatch('updateProfile', this.currentUserProfile)
+        }
+
+        public logout() {
+            this.$store.dispatch("logout")
+        }
+
+        get isAuthenticated() {
+            return !!this.$store.state.currentUser.id;
+        }
     }
 </script>

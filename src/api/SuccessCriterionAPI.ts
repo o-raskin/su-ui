@@ -13,7 +13,7 @@ export abstract class SuccessCriterionAPI {
                 'content-type': 'application/json',
             },
         };
-        let id = val.id
+        let id = val.id;
         let response = await AxiosClient.put('/employee/sc/ '+ id, jsonValue, config);
         return response.data;
     }
