@@ -1,26 +1,28 @@
 <template>
-    <div>
+    <div class="tab-max-size">
         <v-card-subtitle v-if="!!this.user.position && !!this.user.grade">
             {{this.user.position + ' - ' + this.user.grade}}
         </v-card-subtitle>
         <v-card-text>
-            <span v-if="!!this.user.mentorId" class="text-break">
+            <span v-if="!!this.user.mentorId" class="text--secondary">
                 {{mentor_text + ': '}}
-                <a :href="/profile/ + this.user.mentorId">{{this.mentor.name}}</a>
+                <a class="link" @click="goToMentorProfile">
+                    {{this.mentor.name}}
+                </a>
                 <br/>
             </span>
 
-            <span v-if="!!this.user.futurePromotionDate" class="text-break">
+            <span v-if="!!this.user.futurePromotionDate" class="text--secondary">
                 {{user_future_promotion_text + ': ' + this.user.futurePromotionDate}}
                 <br/>
             </span>
 
-            <span v-if="!!this.user.lastPromotionDate" class="text-break">
+            <span v-if="!!this.user.lastPromotionDate" class="text--secondary">
                 {{user_last_promotion_text + ': ' + this.user.lastPromotionDate}}
                 <br/>
             </span>
 
-            <span v-if="!!this.user.inCompanySince" class="text-break">
+            <span v-if="!!this.user.inCompanySince" class="text--secondary">
                 {{user_in_company_text + ': ' + this.user.inCompanySince}}
                 <br/>
             </span>
@@ -46,6 +48,16 @@
 
         @Prop()
         public readonly mentor!: IUser;
+
+        public goToMentorProfile() {
+            this.$router.push({
+                name: 'UserProfile',
+                params:
+                    {
+                        id: this.user.mentorId.toString()
+                    }
+            });
+        }
 
         data() {
             return {

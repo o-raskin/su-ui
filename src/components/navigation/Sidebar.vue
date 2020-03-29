@@ -24,6 +24,7 @@
         items: any[] = [
             {title: 'Home', icon: 'mdi-home', name: 'Home'},
             {title: 'Skill Board', icon: 'mdi-electron-framework', name: 'SkillBoard'},
+            {title: 'Employees', icon: 'mdi-account-supervisor', name: 'SkillBoard'},
         ]
 
         gotoPath(name: string) {

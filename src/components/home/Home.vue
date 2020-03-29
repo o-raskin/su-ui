@@ -1,57 +1,23 @@
 <template>
     <v-container fluid align="center" justify="center" ml-0 mr-0>
-        <v-card outlined class="mx-auto pa-2">
 
-            <div class="justify-space-between">
+        <UserProfile :key="getUser.id" :user="getUser"/>
 
-                <div class="flex-wrap d-flex">
-
-                    <Avatar class="ma-1"
-                            :profile="profile"
-                            :user="user"
-                    />
-
-                    <UserMainInfo
-                            class="ma-1"
-                            :profile="profile"
-                            :user="user"
-                            :mentor="mentor"
-                    />
-
-
-                </div>
-
-                <TODOList class="ma-1"/>
-
-                <!--                <UserActivity/>-->
-
-            </div>
-
-
-        </v-card>
     </v-container>
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
+    import {Component, Vue, Watch} from 'vue-property-decorator';
     import {State} from 'vuex-class'
     import StatusReport from "@/components/status-report/StatusReport.vue";
-    import Login from "@/components/auth/login/Login.vue";
-    import {ProfileAPI} from "@/api/ProfileAPI";
     import {IUser, User} from "@/models/User";
-    import {IProfile, Profile} from "@/models/Profile";
-    import Avatar from "@/components/home/widget/Avatar.vue";
-    import UserMainInfo from "@/components/home/widget/main-info/UserMainInfo.vue";
-    import InProgressList from "@/components/home/widget/InProgressList.vue";
     import {UserAPI} from "@/api/UserAPI";
+    import UserProfile from "@/components/home/UserProfile.vue";
 
     @Component({
         components: {
-            Login,
             StatusReport,
-            Avatar,
-            UserMainInfo,
-            TODOList: InProgressList
+            UserProfile
         },
     })
     export default class Home extends Vue {
@@ -59,39 +25,50 @@
         @State((state) => state.currentUser)
         public readonly currentUser!: IUser;
 
-        public user: IUser = new User();
-        public mentor: IUser = new User();
-        public profile: IProfile = new Profile();
+        public anotherUser: IUser = new User();
 
+        /**
+         *  Check that it's profile of current authorized user
+         */
+        get isAuthorizedUserProfile(): boolean {
+            return !this.$route.params.id || +this.$route.params.id === this.currentUser.id;
+        }
+
+        /**
+         *  Current profile user
+         */
+        get getUser() {
+            return !this.isAuthorizedUserProfile ? this.anotherUser : this.currentUser;
+        }
+
+        /**
+         *  Listener of changing profile page
+         */
+        @Watch('getUser.id')
+        public onUserChange(newVal: number, oldVal: number) {
+            this.fetchUser();
+        }
+
+        /**
+         *  Trigger to fetch user on direct profile load
+         */
         mounted() {
-            let userId = this.currentUser.id;
-            this.user = this.currentUser;
+            this.fetchUser()
+        }
 
-            if (!!this.$route.params.id) {
-                userId = +this.$route.params.id;
-
+        public fetchUser() {
+            if (!this.isAuthorizedUserProfile) {
+                let userId = +this.$route.params.id;
                 UserAPI.getUserById(userId)
                     .then((res) => {
-                        this.user = res.data;
+                        this.anotherUser = res.data;
                     })
                     .catch((error) => {
                         this.$router.push({path: '/404'})
                     });
+            } else {
+                this.$store.dispatch('updateCurrentUserData')
             }
-            ProfileAPI.getUserProfile(userId)
-                .then((res) => {
-                    this.profile = res.data;
-
-                    if (!!this.user.mentorId) {
-                        UserAPI.getUserById(this.user.mentorId)
-                            .then((res) => {
-                                this.mentor = res.data;
-                            })
-                    }
-                })
-                .catch((error) => {
-                    this.$router.push({path: '/404'})
-                });
         }
 
         wakeAlert() {

@@ -9,9 +9,9 @@ const profileModule: Module<any, any> = {
     },
 
     mutations: {
-        setProfile(state, payload: IProfile) {
-            localStorage.setItem('profile-data', JSON.stringify(payload));
-            state.currentUserProfile = payload;
+        setProfile(state, profile: IProfile) {
+            localStorage.setItem('profile-data', JSON.stringify(profile));
+            state.currentUserProfile = profile;
         },
     },
 
@@ -23,14 +23,14 @@ const profileModule: Module<any, any> = {
                 })
         },
 
-        updateProfile(context, profile: IProfile) {
+        updateProfile: function(context, profile: IProfile) {
             if (!!profile.userId) {
                 ProfileAPI.updateProfile(profile.userId, profile)
                     .then(response => {
                         context.commit('setProfile', response.data);
                     })
             }
-        }
+        },
     },
 
     getters: {

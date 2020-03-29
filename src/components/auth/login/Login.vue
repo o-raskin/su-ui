@@ -110,7 +110,7 @@
         created() {
             if (this.token) {
                 localStorage.setItem('ACCESS_TOKEN', this.token)
-                this.$store.dispatch('auth')
+                this.$store.dispatch('updateCurrentUserData')
             }
             this.timer = setInterval(() => {
                 if (this.currentUser.id) {

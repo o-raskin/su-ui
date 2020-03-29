@@ -10,7 +10,10 @@
         <v-spacer></v-spacer>
 
 
-        <v-menu v-if="isAuthenticated" bottom left :close-on-content-click="false">
+        <v-menu v-if="isAuthenticated"
+                bottom
+                left
+                :close-on-content-click="false">
             <template v-slot:activator="{ on }">
                 <v-btn dark icon v-on="on">
                     <v-avatar size="30">
@@ -36,28 +39,6 @@
 
                 <v-divider></v-divider>
 
-                <v-list>
-                    <v-list-item>
-                        <v-list-item-action>
-                            <v-switch
-                                    v-model="currentUserProfile.visibility"
-                                    v-on:change="updateCurrentUserProfile()"
-                                    color="primary"
-                            >
-                            </v-switch>
-                        </v-list-item-action>
-                        <v-list-item-title v-if="currentUserProfile.visibility">
-                            {{visible_profile_text}}
-                        </v-list-item-title>
-                        <v-list-item-title v-if="!currentUserProfile.visibility">
-                            {{invisible_profile_text}}
-                            <span
-                                    class="caption text-break"
-                                    v-if="!currentUserProfile.visibility">
-                                <br/>{{invisible_profile_subtitle_text}}
-                            </span>
-                        </v-list-item-title>
-                    </v-list-item>
 
                     <!--                    <v-list-item>-->
                     <!--                        <v-list-item-action>-->
@@ -65,11 +46,26 @@
                     <!--                        </v-list-item-action>-->
                     <!--                        <v-list-item-title>Enable hints</v-list-item-title>-->
                     <!--                    </v-list-item>-->
-                </v-list>
 
-                <v-card-actions>
-                    <v-btn color="primary" text @click.prevent="logout">LOGOUT</v-btn>
-                </v-card-actions>
+
+                    <ProfileSettings />
+
+                    <v-divider></v-divider>
+
+                    <v-list-item
+
+                            @click.prevent="logout"
+                    >
+                        <v-list-item-avatar>
+                            <v-icon>
+                                mdi-logout-variant
+                            </v-icon>
+                        </v-list-item-avatar>
+                        <v-list-item-title>
+                            {{logout_btn_text}}
+                        </v-list-item-title>
+                    </v-list-item>
+<!--                    <v-btn color="primary" text @click.prevent="logout">LOGOUT</v-btn>-->
             </v-card>
         </v-menu>
     </v-app-bar>
@@ -81,29 +77,23 @@
     import {IProfile} from "@/models/Profile";
     import {IUser} from "@/models/User";
     import profileModule from "../../../store/profile-store";
+    import ProfileSettings from "@/components/home/ProfileSettings.vue"
 
     @Component({
-        components: {},
+        components: {
+            ProfileSettings
+        },
     })
-    export default class Home extends Vue {
-
-        @State((state) => profileModule.state.currentUserProfile)
-        public currentUserProfile!: IProfile;
+    export default class Header extends Vue {
 
         @State((state) => state.currentUser)
         public currentUser!: IUser;
 
         data() {
             return {
+                logout_btn_text: 'Logout',
                 main_title: ['Skill', 'Up', 'sys.'],
-                visible_profile_text: 'Visible profile',
-                invisible_profile_text: 'Invisible profile',
-                invisible_profile_subtitle_text: 'Only important and users in your whitelist can see this page',
             }
-        }
-
-        public updateCurrentUserProfile() {
-            this.$store.dispatch('updateProfile', this.currentUserProfile)
         }
 
         public logout() {

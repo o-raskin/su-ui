@@ -1,5 +1,6 @@
 <template>
     <v-card
+            class="custom-card-border"
             color="primary"
             dark
     >

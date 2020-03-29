@@ -1,6 +1,6 @@
 import {AxiosClient} from "@/api/AxiosClient";
 import {AxiosPromise} from "axios";
-import {IUser} from "@/models/User";
+import {ISimpleUser, IUser} from "@/models/User";
 
 export abstract class UserAPI {
 
@@ -24,6 +24,18 @@ export abstract class UserAPI {
 
     public static getUserById(id: number) : AxiosPromise<IUser> {
         return AxiosClient.get<IUser>("/users/" + id);
+    }
+
+    public static followUser(userId: number, currentUserId: number) : AxiosPromise<ISimpleUser> {
+        if (userId === currentUserId) return Promise.reject('You cannot follow yourself');
+        return AxiosClient.post<ISimpleUser>("/users/" + userId + '/follow',
+            {'followerId': currentUserId});
+    }
+
+    public static unfollowUser(userId: number, currentUserId: number) : AxiosPromise {
+        if (userId === currentUserId) return Promise.reject('You cannot follow yourself');
+        return AxiosClient.post<ISimpleUser>("/users/" + userId + '/unfollow',
+            {'followerId': currentUserId});
     }
 
 }

@@ -41,7 +41,7 @@ export const routes = [
         path: '/profile/:id',
         name: 'UserProfile',
         component: Home,
-        beforeEnter: ifAuthenticated
+        beforeEnter: ifAuthenticated,
     },
     {
         path: '/login',

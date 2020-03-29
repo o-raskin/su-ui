@@ -35,3 +35,14 @@
         }
     });
 </script>
+
+
+<style lang="scss">
+    .link:hover {
+        text-decoration: underline;
+    }
+    .custom-card-border {
+        border: thin solid rgba(0, 0, 0, 0.12);
+        border-radius: 4px;
+    }
+</style>
