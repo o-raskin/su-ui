@@ -13,6 +13,7 @@ export interface IUser {
     inCompanySince: Date;
     followers: ISimpleUser[];
     followings: ISimpleUser[];
+    gradeProgress: number;
 }
 
 export class User implements IUser {
@@ -29,23 +30,28 @@ export class User implements IUser {
     inCompanySince!: Date;
     followers!: ISimpleUser[];
     followings!: ISimpleUser[];
+    gradeProgress!: number;
 }
 
 export interface ISimpleUser {
     id: number;
     name: string;
     imageUrl: string;
+    position: string;
+    gradeProgress: number;
 }
 
 export class SimpleUser implements ISimpleUser {
     id!: number;
     name!: string;
     imageUrl!: string;
+    position!: string;
+    gradeProgress!: number;
 
-
-    constructor(id: number, name: string, imageUrl: string) {
+    constructor(id: number, name: string, imageUrl: string, position: string) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
+        this.position = position;
     }
 }

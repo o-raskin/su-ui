@@ -1,8 +1,9 @@
 <template>
     <v-card
-            class="mx-auto"
+            class="mx-auto mt-10"
             max-width="344"
             outlined
+            elevation="3"
     >
         <v-list-item three-line>
             <v-list-item-content class="text-center">

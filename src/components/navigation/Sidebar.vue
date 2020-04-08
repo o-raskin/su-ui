@@ -24,8 +24,11 @@
         items: any[] = [
             {title: 'Home', icon: 'mdi-home', name: 'Home'},
             {title: 'Skill Board', icon: 'mdi-electron-framework', name: 'SkillBoard'},
-            {title: 'Employees', icon: 'mdi-account-supervisor', name: 'SkillBoard'},
-        ]
+            {title: 'Grade', icon: 'mdi-medal', name: ''},
+            {title: 'Employees', icon: 'mdi-account-supervisor', name: 'ProfilesBoard'},
+            {title: 'Management', icon: 'mdi-account-cog', name: ''},
+            {title: 'System settings', icon: 'mdi-tune-vertical', name: ''},
+        ];
 
         gotoPath(name: string) {
             this.$router.push({ name: name })

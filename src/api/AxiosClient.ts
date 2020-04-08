@@ -10,7 +10,7 @@ export const AxiosClient = Axios.create({
         'Content-Type': 'application/json'
     },
     withCredentials: true
-})
+});
 
 /**
  *  If we're know token => user authenticated => use this token for requests

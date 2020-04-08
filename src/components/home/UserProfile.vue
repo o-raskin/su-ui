@@ -5,7 +5,6 @@
         <div class="justify-space-between">
 
             <div class="flex-wrap d-flex">
-
                 <Avatar class="ma-1"
                         :profile="profile"
                         :user="user"
@@ -18,13 +17,24 @@
                         :user="user"
                         :mentor="mentor"
                 />
-
-
             </div>
 
-            <TODOList class="ma-1"/>
+            <div class="mb-2">
+                <Subordinates class="ma-1"
+                              :user="user"/>
+            </div>
 
-            <!--                <UserActivity/>-->
+            <div>
+                <InProgressList class="ma-1"/>
+            </div>
+
+            <div class="flex-wrap d-flex">
+
+                <UserActivity class="ma-1"/>
+
+                <UserActivity class="ma-1"/>
+
+            </div>
 
         </div>
 
@@ -43,12 +53,16 @@
     import {UserAPI} from "@/api/UserAPI";
     import {State} from "vuex-class";
     import profileModule from "../../../store/profile-store";
+    import Subordinates from "@/components/home/widget/Subordinates.vue";
+    import UserActivity from "@/components/home/widget/UserActivity.vue";
 
     @Component({
         components: {
             Avatar,
             UserMainInfo,
-            TODOList: InProgressList
+            InProgressList,
+            Subordinates,
+            UserActivity
         },
     })
     export default class UserProfile extends Vue {
@@ -62,8 +76,8 @@
         public mentor: IUser = new User();
         public profile: IProfile = new Profile();
 
-        get isAuthorizedUserProfile() : boolean {
-            return this.user.id === this.currentUserProfile.userId
+        get isAuthorizedUserProfile(): boolean {
+            return this.user.id === this.currentUserProfile.user.id;
         }
 
         mounted() {
@@ -77,12 +91,11 @@
                             }
                         })
                         .catch((error) => {
-                            this.$router.push({path: '/404'})
+                            this.$router.push({path: '/403'})
                         });
-                } {
-                    this.profile = this.currentUserProfile
-                    this.fetchMentor()
                 }
+                this.profile = this.currentUserProfile;
+                this.fetchMentor()
             }
         }
 

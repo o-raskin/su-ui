@@ -1,8 +1,8 @@
-import {ISimpleUser, IUser} from "@/models/User";
+import {ISimpleUser} from "@/models/User";
 
 export interface IProfile {
     id?: number;
-    userId: number;
+    user: ISimpleUser;
     visibility: boolean;
     status: string;
     whitelist: ISimpleUser[];
@@ -11,7 +11,7 @@ export interface IProfile {
 export class Profile implements IProfile {
     id!: number;
     status!: string;
-    userId!: number;
+    user!: ISimpleUser;
     visibility!: boolean;
     whitelist!: ISimpleUser[];
 }

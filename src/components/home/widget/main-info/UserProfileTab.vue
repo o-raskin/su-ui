@@ -13,17 +13,17 @@
             </span>
 
             <span v-if="!!this.user.futurePromotionDate" class="text--secondary">
-                {{user_future_promotion_text + ': ' + this.user.futurePromotionDate}}
+                {{user_future_promotion_text + ': ' }} {{ this.user.futurePromotionDate | formatDate }}
                 <br/>
             </span>
 
             <span v-if="!!this.user.lastPromotionDate" class="text--secondary">
-                {{user_last_promotion_text + ': ' + this.user.lastPromotionDate}}
+                {{user_last_promotion_text + ': '}} {{ this.user.lastPromotionDate | formatDate }}
                 <br/>
             </span>
 
             <span v-if="!!this.user.inCompanySince" class="text--secondary">
-                {{user_in_company_text + ': ' + this.user.inCompanySince}}
+                {{user_in_company_text + ': '}} {{this.user.inCompanySince | formatDate }}
                 <br/>
             </span>
         </v-card-text>

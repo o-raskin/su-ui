@@ -14,7 +14,7 @@ export abstract class SuccessCriterionAPI {
             },
         };
         let id = val.id;
-        let response = await AxiosClient.put('/employee/sc/ '+ id, jsonValue, config);
+        let response = await AxiosClient.put('/skills/sc/ '+ id, jsonValue, config);
         return response.data;
     }
 }

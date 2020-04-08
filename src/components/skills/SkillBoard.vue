@@ -6,13 +6,13 @@
 
             <v-spacer/>
 
-            <v-btn icon>
-                <v-icon>mdi-plus</v-icon>
-            </v-btn>
+<!--            <v-btn icon>-->
+<!--                <v-icon>mdi-plus</v-icon>-->
+<!--            </v-btn>-->
 
-            <v-btn icon>
-                <v-icon>mdi-trash-can-outline</v-icon>
-            </v-btn>
+<!--            <v-btn icon>-->
+<!--                <v-icon>mdi-trash-can-outline</v-icon>-->
+<!--            </v-btn>-->
 
             <v-btn icon>
                 <v-icon>mdi-dots-vertical</v-icon>
@@ -50,7 +50,7 @@
                             :selection-type="selectionType"
                             selectable
                             activatable
-                            hoverable="true"
+                            hoverable
                             v-on:update:active="setActive"
                     />
                 </v-card>

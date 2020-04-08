@@ -8,4 +8,15 @@ export abstract class SkillApi {
         return response.data;
     }
 
+    static async getUserGrade(): Promise<ISkill[]>{
+        let response = await AxiosClient.get('/skills/skills');
+        return response.data;
+    }
+
+    static async updateSkill(skill: ISkill): Promise<ISkill>{
+        debugger
+        let response = await AxiosClient.put('/skills/skills/' + skill.id, skill);
+        return response.data;
+    }
+
 }

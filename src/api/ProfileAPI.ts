@@ -8,9 +8,13 @@ export abstract class ProfileAPI {
         return AxiosClient.get<IProfile>('/profiles/' + id);
     }
 
-    public static updateProfile(id: number, profile: IProfile): AxiosPromise<IProfile> {
+    public static getAllActiveProfiles(): AxiosPromise<IProfile[]> {
+        return AxiosClient.get<IProfile[]>('/profiles');
+    }
+
+    public static updateProfile(profile: IProfile): AxiosPromise<IProfile> {
         let jsonValue = JSON.stringify(profile);
-        return AxiosClient.put<IProfile>('/profiles/' + id, jsonValue);
+        return AxiosClient.put<IProfile>('/profiles', jsonValue);
     }
 
 }

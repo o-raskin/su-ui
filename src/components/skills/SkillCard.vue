@@ -45,6 +45,7 @@
                 <!--                    v-if="skill.materials.length !== 0"-->
                 <template
                 >
+                    <v-list-item-title>Materials</v-list-item-title>
                     <v-list-item-subtitle>Materials</v-list-item-subtitle>
                 </template>
             </v-list-item>
@@ -53,8 +54,22 @@
 
             <!--    Actions -->
             <v-card-actions class="mx-2 my-1">
-                <v-btn text>Button</v-btn>
-                <v-btn text>Button</v-btn>
+                <v-btn
+                        v-if="!existsInTODOList"
+                        class="custom-card-border"
+                        elevation="0">
+                    learn
+                </v-btn>
+
+                <v-btn
+                        v-if="!isCompleted && allSuccessCriteriaCompleted"
+                        @click="completeLearnSkill()"
+                        dark
+                        color="green"
+                        class="custom-card-border"
+                        elevation="0">
+                    complete
+                </v-btn>
             </v-card-actions>
 
         </v-card>
@@ -114,16 +129,21 @@
 </template>
 
 
-<script>
-
-    import {ISkill} from "@/models/Skill";
+<script lang="ts">
+    import {Component, Vue, Prop} from 'vue-property-decorator';
+    import {ISkill, ISuccessCriterion} from "@/models/Skill";
     import {SuccessCriterionAPI} from "@/api/SuccessCriterionAPI";
+    import {SkillApi} from "@/api/SkillAPI";
 
-    export default {
-        name: 'SkillCard',
+    @Component({
         components: {
-            SuccessCriterionAPI
         },
+    })
+    export default class SkillCard extends Vue {
+
+        @Prop()
+        public skill!: ISkill;
+
         data() {
             return {
                 successCriteria: [],
@@ -142,6 +162,12 @@
                         icon: 'mdi-alert-circle',
                     },
                     {
+                        id: 'IN_PROGRESS',
+                        text: 'IN PROGRESS',
+                        color: 'grey',
+                        icon: 'mdi-alert-circle',
+                    },
+                    {
                         id: 'PENDING',
                         text: 'PENDING',
                         color: 'orange',
@@ -156,39 +182,60 @@
                 ],
 
             }
-        },
-        props: {
-            skill: ISkill
-        },
-        methods: {
-            successCriterionClick(val) {
-                val.achieved = !val.achieved
-                if (val.achieved === false) {
-                    val.finishDate = null
-                } else {
-                    val.finishDate = new Date().toISOString().slice(0, 10)
-                }
-                SuccessCriterionAPI.update(val);
-            },
-        },
-        watch: {
+        }
 
-        },
-        computed: {
-            defaultAvatar() {
-                var skillName = this.skill.name
-                var uppercaseContent = skillName.replace(/[^A-Z]/g, "")
+        // get isInProgress() : boolean {
+        //
+        // }
 
-                if (uppercaseContent.length >= 2) skillName = uppercaseContent;
+        // public successCriterionClick(val : ISuccessCriterion) {
+        //
+        //         val.achieved = !val.achieved;
+        //
+        //         if (val.achieved === false) {
+        //             val.finishDate = null
+        //         } else {
+        //             val.finishDate =new Date().toISOString().slice(0, 10)
+        //         }
+        //         SuccessCriterionAPI.update(val);
+        // }
 
-                if (!skillName.length) {
-                    return 'S';
-                } else if (skillName.length === 1) {
-                    return skillName.toUpperCase();
-                } else if (skillName.length >= 2) {
-                    return skillName.substring(0, 2).toUpperCase();
-                }
-            },
-        },
+        // public completeLearnSkill() {
+        //     this.skill.status = 'PENDING';
+        //     SkillApi.updateSkill(this.skill)
+        //         .then(res => {
+        //             this.skill = res;
+        //         })
+        // }
+
+        // get isCompleted() : boolean {
+        //     return this.skill.status === 'APPROVED' || this.skill.status === 'PENDING';
+        // }
+
+        // get allSuccessCriteriaCompleted() : boolean {
+        //     let i = this.skill.successCriteria.findIndex(sc => !sc.achieved);
+        //     return i === -1;
+        // }
+
+        get existsInTODOList() : boolean {
+
+            //TODO: add logic
+            return false;
+        }
+
+        get defaultAvatar() {
+            var skillName = this.skill.name
+            var uppercaseContent = skillName.replace(/[^A-Z]/g, "")
+
+            if (uppercaseContent.length >= 2) skillName = uppercaseContent;
+
+            if (!skillName.length) {
+                return 'S';
+            } else if (skillName.length === 1) {
+                return skillName.toUpperCase();
+            } else if (skillName.length >= 2) {
+                return skillName.substring(0, 2).toUpperCase();
+            }
+        }
     }
 </script>

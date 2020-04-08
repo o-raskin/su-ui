@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Skills from "@/components/skills/SkillBoard.vue";
+import SkillBoard from "@/components/skills/SkillBoard.vue";
+import ProfilesBoard from "@/components/employee/ProfilesBoard.vue";
 import Home from '@/components/home/Home.vue';
 import NotFound from '@/components/common/NotFound.vue';
+import Forbidden from '@/components/common/Forbidden.vue';
 import Login from '@/components/auth/login/Login.vue';
 import {store} from '../../store';
 
@@ -28,7 +30,13 @@ export const routes = [
     {
         path: '/skills',
         name: 'SkillBoard',
-        component: Skills,
+        component: SkillBoard,
+        beforeEnter: ifAuthenticated,
+    },
+     {
+        path: '/employees',
+        name: 'ProfilesBoard',
+        component: ProfilesBoard,
         beforeEnter: ifAuthenticated,
     },
     {
@@ -60,6 +68,11 @@ export const routes = [
     {
         path: '/404',
         component: NotFound,
+        beforeEnter: ifAuthenticated
+    },
+    {
+        path: '/403',
+        component: Forbidden,
         beforeEnter: ifAuthenticated
     },
     {

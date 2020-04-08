@@ -38,4 +38,7 @@ export abstract class UserAPI {
             {'followerId': currentUserId});
     }
 
+    public static getUserSubordinates(id: number) : AxiosPromise<ISimpleUser[]> {
+        return AxiosClient.get<ISimpleUser[]>("/users/" + id + "/subordinates");
+    }
 }

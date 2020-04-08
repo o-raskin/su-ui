@@ -24,8 +24,8 @@ const profileModule: Module<any, any> = {
         },
 
         updateProfile: function(context, profile: IProfile) {
-            if (!!profile.userId) {
-                ProfileAPI.updateProfile(profile.userId, profile)
+            if (!!profile.user.id) {
+                ProfileAPI.updateProfile(profile)
                     .then(response => {
                         context.commit('setProfile', response.data);
                     })

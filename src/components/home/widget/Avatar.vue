@@ -17,12 +17,12 @@
         <div class="ma-3">
             <v-progress-linear
                     :height="current_grade_progress_height"
-                    :value="current_grade_progress"
-                    dark
+                    :value="user.gradeProgress"
+                    :dark="user.gradeProgress > 50"
                     rounded
                     class="overline custom-card-border"
             >
-                {{current_grade_progress + '%'}}
+                {{user.gradeProgress + '%'}}
             </v-progress-linear>
         </div>
 
@@ -93,15 +93,21 @@
 
         public userGradeProgress!: number;
 
+        mounted() {
+
+        }
+
         public follow() {
             this.$store.dispatch('follow', this.user.id);
-            let follower = new SimpleUser(this.currentUser.id, this.currentUser.name, this.currentUser.imageUrl);
+            let follower = new SimpleUser(this.currentUser.id, this.currentUser.name, this.currentUser.imageUrl,
+                this.currentUser.position);
             this.user.followers.push(follower);
         }
 
         public unfollow() {
             this.$store.dispatch('unfollow', this.user.id);
-            let follower = new SimpleUser(this.currentUser.id, this.currentUser.name, this.currentUser.imageUrl);
+            let follower = new SimpleUser(this.currentUser.id, this.currentUser.name, this.currentUser.imageUrl,
+                this.currentUser.position);
             this.user.followers.splice(this.user.followers.indexOf(follower), 1);
         }
 
@@ -140,7 +146,6 @@
                 btn_unfollow_text: 'Unfollow',
                 btn_approve_grade_text: 'Grade approve',
 
-                current_grade_progress: 100,
                 current_grade_progress_height: 20,
             }
         }

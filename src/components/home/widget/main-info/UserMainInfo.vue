@@ -23,7 +23,7 @@
                                 @click="enableEditingStatus"
                                 class="pa-2 body-2 text--secondary"
                         >
-                            {{profile.status}}
+                            {{profileStatus}}
                         </span>
                     </div>
                     <v-form
@@ -55,10 +55,9 @@
                 </div>
                 <div class="ml-2 mr-2" v-if="!isAuthorizedUserProfile">
                    <span class="pa-2 body-2 text--secondary">
-                       {{profile.status}}
+                       {{profileStatus}}
                    </span>
                 </div>
-
 
                 <v-tabs vertical grow>
                     <v-tabs-slider></v-tabs-slider>
@@ -129,8 +128,15 @@
         public tempValue: string = this.profile.status;
         public validStatus: boolean = false;
 
+        get profileStatus() : string {
+            if (this.profile.status === '' && this.isAuthorizedUserProfile) {
+                return '...'
+            }
+            return this.profile.status;
+        }
+
         get isAuthorizedUserProfile(): boolean {
-            return this.currentUser.id === this.profile.userId
+            return this.currentUser.id === this.profile.user.id
         }
 
         get isInWhitelist() {
@@ -162,7 +168,7 @@
         data() {
             return {
                 statusRules: [
-                    (v: any) => (v && v.length <= 50)
+                    (v: any) => (v && v.length <= 50 || v.length == 0)
                 ],
             }
         }
