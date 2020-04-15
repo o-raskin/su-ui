@@ -1,3 +1,4 @@
+import {IPosition} from "@/models/Position";
 
 export interface IUser {
     id: number;
@@ -5,15 +6,17 @@ export interface IUser {
     email: string;
     imageUrl: string;
     provider: string;
-    position: string;
+    position: IPosition;
     grade: string;
-    mentorId: number;
+    role: string;
+    mentor: ISimpleUser;
     lastPromotionDate: Date;
     futurePromotionDate: Date;
     inCompanySince: Date;
     followers: ISimpleUser[];
     followings: ISimpleUser[];
     gradeProgress: number;
+    active:boolean;
 }
 
 export class User implements IUser {
@@ -22,22 +25,24 @@ export class User implements IUser {
     email!: string;
     imageUrl!: string;
     provider!: string;
-    position!: string;
+    position!: IPosition;
     grade!: string;
-    mentorId!: number;
+    role!: string;
+    mentor!: ISimpleUser;
     lastPromotionDate!: Date;
     futurePromotionDate!: Date;
     inCompanySince!: Date;
     followers!: ISimpleUser[];
     followings!: ISimpleUser[];
     gradeProgress!: number;
+    active!:boolean;
 }
 
 export interface ISimpleUser {
     id: number;
     name: string;
     imageUrl: string;
-    position: string;
+    position: IPosition;
     gradeProgress: number;
 }
 
@@ -45,10 +50,10 @@ export class SimpleUser implements ISimpleUser {
     id!: number;
     name!: string;
     imageUrl!: string;
-    position!: string;
+    position!: IPosition;
     gradeProgress!: number;
 
-    constructor(id: number, name: string, imageUrl: string, position: string) {
+    constructor(id: number, name: string, imageUrl: string, position: IPosition) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;

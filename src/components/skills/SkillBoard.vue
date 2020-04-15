@@ -1,25 +1,25 @@
 <template>
     <v-container>
-        <v-toolbar dense short flat>
+        <!--        <v-toolbar dense short flat>-->
 
-            <v-toolbar-title>Skill Board</v-toolbar-title>
+        <!--            <v-toolbar-title>Skill Board</v-toolbar-title>-->
 
-            <v-spacer/>
+        <!--            <v-spacer/>-->
 
-<!--            <v-btn icon>-->
-<!--                <v-icon>mdi-plus</v-icon>-->
-<!--            </v-btn>-->
+        <!--&lt;!&ndash;            <v-btn icon>&ndash;&gt;-->
+        <!--&lt;!&ndash;                <v-icon>mdi-plus</v-icon>&ndash;&gt;-->
+        <!--&lt;!&ndash;            </v-btn>&ndash;&gt;-->
 
-<!--            <v-btn icon>-->
-<!--                <v-icon>mdi-trash-can-outline</v-icon>-->
-<!--            </v-btn>-->
+        <!--&lt;!&ndash;            <v-btn icon>&ndash;&gt;-->
+        <!--&lt;!&ndash;                <v-icon>mdi-trash-can-outline</v-icon>&ndash;&gt;-->
+        <!--&lt;!&ndash;            </v-btn>&ndash;&gt;-->
 
-            <v-btn icon>
-                <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
-        </v-toolbar>
+        <!--            <v-btn icon>-->
+        <!--                <v-icon>mdi-dots-vertical</v-icon>-->
+        <!--            </v-btn>-->
+        <!--        </v-toolbar>-->
 
-        <v-divider/>
+        <!--        <v-divider/>-->
 
         <v-row>
             <v-col>
@@ -35,12 +35,22 @@
                                 clearable
                                 clear-icon="mdi-close-circle-outline"
                         ></v-text-field>
-                        <v-checkbox
-                                v-model="caseSensitive"
-                                dark
-                                hide-details
-                                label="case sensitive"
-                        ></v-checkbox>
+                        <v-container class="d-flex pa-0 ma-0">
+                            <v-checkbox
+                                    v-model="caseSensitive"
+                                    dark
+                                    hide-details
+                                    label="case sensitive"
+                            ></v-checkbox>
+                            <v-spacer></v-spacer>
+                            <v-switch
+                                    class="mr-2 ml-2"
+                                    v-model="needForGrade"
+                                    dark
+                                    hide-details
+                                    label="required for grade"
+                            >for grade</v-switch>
+                        </v-container>
                     </v-sheet>
                     <v-treeview
                             v-model="selection"
@@ -48,7 +58,6 @@
                             :search="search"
                             :filter="filter"
                             :selection-type="selectionType"
-                            selectable
                             activatable
                             hoverable
                             v-on:update:active="setActive"
@@ -58,7 +67,7 @@
             <v-divider vertical/>
             <v-col>
                 <template v-if="activeSkill === null">
-                    <p class="text--disabled">
+                    <p class="title grey--text text--lighten-1 font-weight-light">
                         Choose skill...
                     </p>
                 </template>
@@ -73,7 +82,7 @@
 
 
 <script>
-    import {SkillApi} from "@/api/SkillAPI";
+    import {SkillsAPI} from "@/api/SkillsAPI";
     import SkillCard from './SkillCard';
     import _ from 'lodash';
 
@@ -92,6 +101,7 @@
                 //  Filter
                 search: null,
                 caseSensitive: false,
+                needForGrade: false,
 
                 // Strings
                 filter_default_value: 'Start typing to filter...'
@@ -139,7 +149,7 @@
             }
         },
         computed: {
-            filter () {
+            filter() {
                 return this.caseSensitive
                     ? (skill, search, name) => skill[name].indexOf(search) > -1
                     : undefined
@@ -147,7 +157,7 @@
         },
 
         async mounted() {
-            this.skills = await SkillApi.getAll();
+            this.skills = await SkillsAPI.getAll();
         },
 
 

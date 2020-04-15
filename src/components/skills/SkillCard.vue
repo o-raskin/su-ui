@@ -3,17 +3,20 @@
         <v-card class="mx-auto" outlined>
             <v-list-item>
                 <!--    Status  -->
-                <v-chip :key="index" v-for="(item, index) in status" v-if="skill.status === item.id"
-                        :color="item.color"
+
+                <v-chip :key="index"
+                        v-for="(s, index) in this.status_list"
+                        v-if="userSkillData.status === s.id"
+                        :color="s.color"
                         text-color="white"
                         label
                         small
-                        :value="item.text"
+                        :value="s.text"
                 >
                     <v-avatar left>
-                        <v-icon small>{{item.icon}}</v-icon>
+                        <v-icon small>{{s.icon}}</v-icon>
                     </v-avatar>
-                    {{item.text}}
+                    {{s.text}}
                 </v-chip>
             </v-list-item>
 
@@ -54,12 +57,6 @@
 
             <!--    Actions -->
             <v-card-actions class="mx-2 my-1">
-                <v-btn
-                        v-if="!existsInTODOList"
-                        class="custom-card-border"
-                        elevation="0">
-                    learn
-                </v-btn>
 
                 <v-btn
                         v-if="!isCompleted && allSuccessCriteriaCompleted"
@@ -69,6 +66,20 @@
                         class="custom-card-border"
                         elevation="0">
                     complete
+                </v-btn>
+
+                <v-btn
+                        v-if="!isInProgress"
+                        class="custom-card-border"
+                        elevation="0">
+                    learn
+                </v-btn>
+
+                <v-btn
+                        v-if="isEnableToStop"
+                        class="custom-card-border"
+                        elevation="0">
+                    stop learning
                 </v-btn>
             </v-card-actions>
 
@@ -130,10 +141,13 @@
 
 
 <script lang="ts">
-    import {Component, Vue, Prop} from 'vue-property-decorator';
+    import {Component, Vue, Prop, Watch} from 'vue-property-decorator';
     import {ISkill, ISuccessCriterion} from "@/models/Skill";
     import {SuccessCriterionAPI} from "@/api/SuccessCriterionAPI";
-    import {SkillApi} from "@/api/SkillAPI";
+    import {SkillsAPI} from "@/api/SkillsAPI";
+    import {IUserSkill, UserSkill} from "@/models/UserSkill";
+    import {State} from "vuex-class";
+    import {IUser} from "@/models/User";
 
     @Component({
         components: {
@@ -141,14 +155,19 @@
     })
     export default class SkillCard extends Vue {
 
+        @State((state) => state.currentUser)
+        public readonly currentUser!: IUser;
+
         @Prop()
         public skill!: ISkill;
+
+        public userSkillData: IUserSkill = new UserSkill();
 
         data() {
             return {
                 successCriteria: [],
                 selectedSuccessCriteria: [],
-                status: [
+                status_list: [
                     {
                         id: 'NOT_MANDATORY',
                         text: 'NOT MANDATORY',
@@ -165,7 +184,7 @@
                         id: 'IN_PROGRESS',
                         text: 'IN PROGRESS',
                         color: 'grey',
-                        icon: 'mdi-alert-circle',
+                        icon: 'mdi-dots-horizontal-circle',
                     },
                     {
                         id: 'PENDING',
@@ -184,9 +203,30 @@
             }
         }
 
-        // get isInProgress() : boolean {
-        //
-        // }
+        @Watch("skill")
+        public updateSkillData() {
+            this.mounted()
+        }
+
+        mounted() {
+            this.fetchUserSkillData()
+        }
+
+        //  ACTIONS
+
+        public startLearning() {
+            //TODO: add here logic for change UserSkill status to IN_PROGRESS!
+        }
+
+        //  API
+
+        public fetchUserSkillData() {
+            SkillsAPI.getUserSkill(this.currentUser.id, this.skill.id)
+                .then(r => {
+                    debugger
+                    this.userSkillData = r.data;
+                })
+        }
 
         // public successCriterionClick(val : ISuccessCriterion) {
         //
@@ -199,7 +239,7 @@
         //         }
         //         SuccessCriterionAPI.update(val);
         // }
-
+        //
         // public completeLearnSkill() {
         //     this.skill.status = 'PENDING';
         //     SkillApi.updateSkill(this.skill)
@@ -208,20 +248,30 @@
         //         })
         // }
 
-        // get isCompleted() : boolean {
-        //     return this.skill.status === 'APPROVED' || this.skill.status === 'PENDING';
-        // }
+        //  STATUS HANDLING
+
+        get isNotLearned() : boolean {
+            return this.userSkillData.status === 'NOT_MANDATORY' ||
+                this.userSkillData.status === 'NEED_TO_KNOW';
+        }
+
+        get isInProgress() : boolean {
+            return this.isNotLearned && this.userSkillData.status === 'IN_PROGRESS';
+        }
+
+        get isCompleted() : boolean {
+            return !this.isInProgress &&
+                (this.userSkillData.status === 'APPROVED' || this.userSkillData.status === 'PENDING');
+        }
+
+        get isEnableToStop() : boolean {
+            return this.isInProgress && this.userSkillData.status !== '';
+        }
 
         // get allSuccessCriteriaCompleted() : boolean {
         //     let i = this.skill.successCriteria.findIndex(sc => !sc.achieved);
         //     return i === -1;
         // }
-
-        get existsInTODOList() : boolean {
-
-            //TODO: add logic
-            return false;
-        }
 
         get defaultAvatar() {
             var skillName = this.skill.name

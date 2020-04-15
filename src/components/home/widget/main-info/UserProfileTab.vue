@@ -4,10 +4,10 @@
             {{this.user.position + ' - ' + this.user.grade}}
         </v-card-subtitle>
         <v-card-text>
-            <span v-if="!!this.user.mentorId" class="text--secondary">
+            <span v-if="!!this.user.mentor" class="text--secondary">
                 {{mentor_text + ': '}}
                 <a class="link" @click="goToMentorProfile">
-                    {{this.mentor.name}}
+                    {{this.user.mentor.name}}
                 </a>
                 <br/>
             </span>
@@ -46,15 +46,12 @@
         @Prop()
         public readonly profile!: IProfile;
 
-        @Prop()
-        public readonly mentor!: IUser;
-
         public goToMentorProfile() {
             this.$router.push({
                 name: 'UserProfile',
                 params:
                     {
-                        id: this.user.mentorId.toString()
+                        id: this.user.mentor.id.toString()
                     }
             });
         }

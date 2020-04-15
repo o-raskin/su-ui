@@ -6,7 +6,7 @@ export interface ISuccessCriterion {
 }
 
 export interface ISkill {
-    id?: number;
+    id: number;
     name: string;
     description: string;
     parent: ISkill;

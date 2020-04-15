@@ -1,7 +1,12 @@
 <template>
     <v-navigation-drawer  dark fixed app clipped permanent expand-on-hover>
         <v-list nav dense>
-            <v-list-item @click="gotoPath(item.name)" link :key="index" v-for="(item, index) in items">
+            <v-list-item @click="gotoPath(item.name)"
+                         link
+                         :key="index"
+                         v-for="(item, index) in items"
+                         :disabled="item.disabled"
+            >
                 <v-list-item-icon>
                     <v-icon>{{item.icon}}</v-icon>
                 </v-list-item-icon>
@@ -21,13 +26,13 @@
     export default class Sidebar extends Vue {
 
         /*  Routing  */
-        items: any[] = [
+        public items: any[] = [
             {title: 'Home', icon: 'mdi-home', name: 'Home'},
             {title: 'Skill Board', icon: 'mdi-electron-framework', name: 'SkillBoard'},
-            {title: 'Grade', icon: 'mdi-medal', name: ''},
+            {title: 'Grade', icon: 'mdi-medal', name: '', disabled: true},
             {title: 'Employees', icon: 'mdi-account-supervisor', name: 'ProfilesBoard'},
-            {title: 'Management', icon: 'mdi-account-cog', name: ''},
-            {title: 'System settings', icon: 'mdi-tune-vertical', name: ''},
+            {title: 'Management', icon: 'mdi-account-cog', name: 'Management'},
+            {title: 'System settings', icon: 'mdi-tune-vertical', name: '', disabled: true},
         ];
 
         gotoPath(name: string) {

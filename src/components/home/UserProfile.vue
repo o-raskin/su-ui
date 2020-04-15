@@ -15,7 +15,6 @@
                         class="ma-1"
                         :profile="profile"
                         :user="user"
-                        :mentor="mentor"
                 />
             </div>
 
@@ -73,7 +72,6 @@
         @Prop()
         public readonly user!: IUser;
 
-        public mentor: IUser = new User();
         public profile: IProfile = new Profile();
 
         get isAuthorizedUserProfile(): boolean {
@@ -86,25 +84,12 @@
                     ProfileAPI.getUserProfile(this.user.id)
                         .then((res) => {
                             this.profile = res.data;
-                            if (!!this.user.mentorId) {
-                                this.fetchMentor()
-                            }
                         })
                         .catch((error) => {
                             this.$router.push({path: '/403'})
                         });
                 }
                 this.profile = this.currentUserProfile;
-                this.fetchMentor()
-            }
-        }
-
-        public fetchMentor() {
-            if (!!this.user.mentorId) {
-                UserAPI.getUserById(this.user.mentorId)
-                    .then((res) => {
-                        this.mentor = res.data;
-                    })
             }
         }
 

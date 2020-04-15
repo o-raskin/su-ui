@@ -128,7 +128,7 @@
         }
 
         get isWard(): boolean {
-            return this.currentUser.id === this.user.mentorId
+            return !!this.user.mentor && this.currentUser.id === this.user.mentor.id;
         }
 
         get haveInFollowers(): boolean {

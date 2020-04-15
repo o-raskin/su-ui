@@ -71,7 +71,7 @@
             }
         }
 
-        wakeAlert() {
+        public wakeAlert() {
             this.$bus.$emit('status', {text: 'MY TEXT', color: 'error'})
         }
 

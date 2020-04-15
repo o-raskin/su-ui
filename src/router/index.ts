@@ -7,6 +7,7 @@ import NotFound from '@/components/common/NotFound.vue';
 import Forbidden from '@/components/common/Forbidden.vue';
 import Login from '@/components/auth/login/Login.vue';
 import {store} from '../../store';
+import Management from "@/components/management/Management.vue";
 
 Vue.use(VueRouter)
 
@@ -49,6 +50,12 @@ export const routes = [
         path: '/profile/:id',
         name: 'UserProfile',
         component: Home,
+        beforeEnter: ifAuthenticated,
+    },
+    {
+        path: '/management',
+        name: 'Management',
+        component: Management,
         beforeEnter: ifAuthenticated,
     },
     {

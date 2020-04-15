@@ -73,8 +73,7 @@
                     </v-tab>
                     <v-tab-item>
                         <UserProfileTab :profile="profile"
-                                        :user="user"
-                                        :mentor="mentor"/>
+                                        :user="user"/>
                     </v-tab-item>
                     <v-tab-item>
                         <UserFollowersTab :user="user"/>
@@ -121,22 +120,21 @@
         @Prop()
         public readonly profile!: IProfile;
 
-        @Prop()
-        public readonly mentor!: IUser;
-
         public editing: boolean = false;
         public tempValue: string = this.profile.status;
         public validStatus: boolean = false;
 
         get profileStatus() : string {
-            if (this.profile.status === '' && this.isAuthorizedUserProfile) {
+            debugger
+            if ((!this.profile.status || this.profile.status === '') && this.isAuthorizedUserProfile) {
+                debugger
                 return '...'
             }
             return this.profile.status;
         }
 
         get isAuthorizedUserProfile(): boolean {
-            return this.currentUser.id === this.profile.user.id
+            return !!this.profile.user && this.currentUser.id === this.profile.user.id
         }
 
         get isInWhitelist() {

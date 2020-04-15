@@ -5,8 +5,6 @@
                 :items-per-page.sync="itemsPerPage"
                 :page="page"
                 :search="search"
-                :sort-by="sortBy.toLowerCase()"
-                :sort-desc="sortDesc"
                 hide-default-footer
         >
             <template v-slot:header>
@@ -25,36 +23,6 @@
                     />
                     <template v-if="$vuetify.breakpoint.mdAndUp">
                         <v-spacer></v-spacer>
-                        <v-select
-                                v-model="sortBy"
-                                flat
-                                solo-inverted
-                                hide-details
-                                :items="keys"
-                                label="Sort by"
-                        ></v-select>
-                        <v-spacer></v-spacer>
-                        <v-btn-toggle
-                                v-model="sortDesc"
-                                mandatory
-                        >
-                            <v-btn
-                                    large
-                                    depressed
-                                    color="blue"
-                                    :value="false"
-                            >
-                                <v-icon>mdi-arrow-up</v-icon>
-                            </v-btn>
-                            <v-btn
-                                    large
-                                    depressed
-                                    color="blue"
-                                    :value="true"
-                            >
-                                <v-icon>mdi-arrow-down</v-icon>
-                            </v-btn>
-                        </v-btn-toggle>
                     </template>
                 </v-toolbar>
             </template>
@@ -84,24 +52,6 @@
                                     <v-img :src="item.user.imageUrl"></v-img>
                                 </v-list-item-avatar>
                             </v-list-item>
-
-                            <v-divider></v-divider>
-
-                            <v-list dense>
-                                <v-list-item
-                                        v-for="(key, index) in keys"
-                                        :key="index"
-                                        class="body-2"
-                                >
-                                    <v-list-item-content :class="{ 'blue--text': sortBy === key }">
-                                        {{ key }}:
-                                    </v-list-item-content>
-                                    <v-list-item-content class="align-end"
-                                                         :class="{ 'blue--text': sortBy === key }">
-                                        {{item.user[key.toLowerCase()] }}
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </v-list>
 
                         </v-card>
                     </v-col>
@@ -163,36 +113,6 @@
             </template>
         </v-data-iterator>
     </v-card>
-
-    <!--    <v-card-->
-    <!--            max-width="500"-->
-    <!--            class="mx-auto"-->
-    <!--    >-->
-
-    <!--        <v-list two-line subheader>-->
-    <!--            <v-subheader>Employees</v-subheader>-->
-
-    <!--            <v-list-item-->
-    <!--                    v-for="profile in this.profiles"-->
-    <!--                    :key="profile.user.id"-->
-    <!--                    @click="goToUserProfile(profile.user.id)"-->
-    <!--            >-->
-    <!--                <v-list-item-avatar>-->
-    <!--                    <v-img :src="profile.user.imageUrl"></v-img>-->
-    <!--                </v-list-item-avatar>-->
-
-    <!--                <v-list-item-content>-->
-    <!--                    <v-list-item-title v-text="profile.user.name"></v-list-item-title>-->
-    <!--                    <v-list-item-subtitle v-text="profile.user.position"></v-list-item-subtitle>-->
-    <!--                </v-list-item-content>-->
-
-    <!--                <v-list-item-icon>-->
-    <!--                    <v-icon v-if="!profile.visibility && !hasAccessToProfile">mdi-lock</v-icon>-->
-    <!--                    <v-icon v-if="hasAccessToProfile">mdi-lock-open-variant</v-icon>-->
-    <!--                </v-list-item-icon>-->
-    <!--            </v-list-item>-->
-    <!--        </v-list>-->
-    <!--    </v-card>-->
 </template>
 
 <script lang="ts">
@@ -226,7 +146,7 @@
         public sortBy: string = 'name';
 
         public keys: string[] = [
-            'Position',
+            'Name',
         ];
 
         get numberOfPages(): number {
