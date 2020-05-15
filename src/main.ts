@@ -24,6 +24,15 @@ Vue.filter('formatDate', function (value: any) {
         return moment(String(value), 'YYYY-MM-DD').format('DD.MM.YYYY');
     }
 });
+Vue.filter('formatDateTime', function (value: any) {
+    if (value) {
+        let d = moment(String(value)).format('HH:MM DD.MM.YYYY');
+        if (!d || d === 'Invalid date') {
+            d = moment(String(value), 'YYYY-MM-DD').format('DD.MM.YYYY');
+        }
+        return d;
+    }
+});
 
 /**
  *    ROUTER

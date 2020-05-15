@@ -8,6 +8,7 @@
                 <Avatar class="ma-1"
                         :profile="profile"
                         :user="user"
+                        :skillsUser="skillsUser"
                 />
 
                 <UserMainInfo
@@ -18,22 +19,29 @@
                 />
             </div>
 
-            <div class="mb-2">
+            <div class="ma-0 pa-0">
                 <Subordinates class="ma-1"
                               :user="user"/>
             </div>
 
-            <div>
-                <InProgressList class="ma-1"/>
+            <div class="ma-0 pa-0 flex-wrap d-flex">
+
+                <UserActivity :user="user"
+                              :skillsUser="skillsUser"
+                              class="flex-grow-1 ma-1"/>
+
+                <History class="flex-grow-1 ma-1"
+                         :user="user"
+                         :skillsUser="skillsUser"/>
+
+                <InProgressList class="flex-grow-1 ma-1"
+                                :user="user"
+                                :skillsUser="skillsUser"/>
+
             </div>
 
-            <div class="flex-wrap d-flex">
-
-                <UserActivity class="ma-1"/>
-
-                <UserActivity class="ma-1"/>
-
-            </div>
+            <Grades class="flex-grow-1 ma-1" :user="user"
+                     :skillsUser="skillsUser"/>
 
         </div>
 
@@ -46,14 +54,18 @@
     import {ProfileAPI} from "@/api/ProfileAPI";
     import {IUser, User} from "@/models/User";
     import {IProfile, Profile} from "@/models/Profile";
-    import Avatar from "@/components/home/widget/Avatar.vue";
-    import UserMainInfo from "@/components/home/widget/main-info/UserMainInfo.vue";
-    import InProgressList from "@/components/home/widget/InProgressList.vue";
+    import Avatar from "@/components/profile/widget/Avatar.vue";
+    import UserMainInfo from "@/components/profile/widget/main-info/UserMainInfo.vue";
+    import InProgressList from "@/components/profile/widget/GradeProgress.vue";
     import {UserAPI} from "@/api/UserAPI";
     import {State} from "vuex-class";
     import profileModule from "../../../store/profile-store";
-    import Subordinates from "@/components/home/widget/Subordinates.vue";
-    import UserActivity from "@/components/home/widget/UserActivity.vue";
+    import Subordinates from "@/components/profile/widget/Subordinates.vue";
+    import UserActivity from "@/components/profile/widget/Activity.vue";
+    import History from "@/components/profile/widget/History.vue";
+    import Grades from "@/components/profile/widget/Achievements.vue";
+    import {SkillsAPI} from "@/api/SkillsAPI";
+    import {ISkillsUser, SkillsUser} from "@/models/SkillsUser";
 
     @Component({
         components: {
@@ -61,7 +73,9 @@
             UserMainInfo,
             InProgressList,
             Subordinates,
-            UserActivity
+            UserActivity,
+            History,
+            Grades
         },
     })
     export default class UserProfile extends Vue {
@@ -73,6 +87,10 @@
         public readonly user!: IUser;
 
         public profile: IProfile = new Profile();
+
+        public skillsUser: ISkillsUser = new SkillsUser();
+
+        public dialog: boolean = false;
 
         get isAuthorizedUserProfile(): boolean {
             return this.user.id === this.currentUserProfile.user.id;
@@ -90,6 +108,12 @@
                         });
                 }
                 this.profile = this.currentUserProfile;
+
+                SkillsAPI.getUserById(this.user.id)
+                    .then(r => {
+                        this.skillsUser = r.data
+                        debugger
+                    });
             }
         }
 

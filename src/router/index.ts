@@ -2,12 +2,14 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import SkillBoard from "@/components/skills/SkillBoard.vue";
 import ProfilesBoard from "@/components/employee/ProfilesBoard.vue";
-import Home from '@/components/home/Home.vue';
+import Home from '@/components/profile/Home.vue';
 import NotFound from '@/components/common/NotFound.vue';
 import Forbidden from '@/components/common/Forbidden.vue';
 import Login from '@/components/auth/login/Login.vue';
 import {store} from '../../store';
 import Management from "@/components/management/Management.vue";
+import SkillTable from "@/components/skills/SkillTable.vue";
+import PlanningBoard from "@/components/planning/PlanningBoard.vue";
 
 Vue.use(VueRouter)
 
@@ -34,10 +36,28 @@ export const routes = [
         component: SkillBoard,
         beforeEnter: ifAuthenticated,
     },
-     {
+    {
+        path: '/skills/:id',
+        name: 'UserSkillBoard',
+        component: SkillBoard,
+        beforeEnter: ifAuthenticated,
+    },
+    {
+        path: '/skills/:id/table',
+        name: 'UserSkillTable',
+        component: SkillTable,
+        beforeEnter: ifAuthenticated,
+    },
+    {
         path: '/employees',
         name: 'ProfilesBoard',
         component: ProfilesBoard,
+        beforeEnter: ifAuthenticated,
+    },
+    {
+        path: '/planning',
+        name: 'PlanningBoard',
+        component: PlanningBoard,
         beforeEnter: ifAuthenticated,
     },
     {
@@ -64,14 +84,6 @@ export const routes = [
         component: Login,
         beforeEnter: ifNotAuthenticated,
     },
-    // {
-    //     path: '/500',
-    //     component: ServerError,
-    //     meta:
-    //         {
-    //             //title: 'common.view.500.title'
-    //         }
-    // },
     {
         path: '/404',
         component: NotFound,
@@ -79,6 +91,7 @@ export const routes = [
     },
     {
         path: '/403',
+        name: 'Forbidden',
         component: Forbidden,
         beforeEnter: ifAuthenticated
     },

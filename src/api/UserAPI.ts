@@ -52,6 +52,7 @@ export abstract class  UserAPI {
         return AxiosClient.put<IUser>("/users/" + user.id, user);
     }
 
+    // deprecated
     public static updateField(userId: number, fieldName: string, fieldValue: any) : AxiosPromise<IUser> {
 
         let change = new PatchChange('replace', fieldName, fieldValue);

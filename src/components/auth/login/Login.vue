@@ -1,67 +1,86 @@
 <template>
-    <v-card
-            class="mx-auto mt-10"
-            max-width="344"
-            outlined
-            elevation="3"
-    >
-        <v-list-item three-line>
-            <v-list-item-content class="text-center">
+    <div class="welcome-container">
+        <v-card
+                class="mx-auto mt-10"
+                max-width="344"
+                outlined
+                elevation="3"
+        >
+            <v-list-item three-line>
+                <v-list-item-content class="text-center">
 
-                <v-list-item-title class="headline mb-1">{{welcome}}</v-list-item-title>
+                    <div class="text-center mb-5">
+                        <v-chip large
+                                class="ma-2"
+                                color="primary"
+                        >
+                            <div class="logo-color headline text-uppercase">
+                                <span class="font-weight-light">{{main_title[0]}} </span> -
+                                <span class="font-weight-bold">{{main_title[1]}} </span>
+                                <span class="overline">{{main_title[2]}}</span>
+                            </div>
+                        </v-chip>
+                    </div>
 
-                <v-list-item-subtitle>{{login_request}}</v-list-item-subtitle>
+                    <v-list-item-title class="mb-1">
+                        <div class="headline">
+                            {{welcome}}
+                        </div>
+                    </v-list-item-title>
 
-                <v-divider class="ma-3"/>
+                    <v-list-item-subtitle>{{login_request}}</v-list-item-subtitle>
 
-                <div class="text-center"
-                     v-if="login_type === 'google'">
-                    <v-chip
-                            @click.prevent="login"
-                            class="ma-2"
-                            outlined
+                    <v-divider class="ma-3"/>
+
+                    <div class="text-center"
+                         v-if="login_type === 'google'">
+                        <v-chip
+                                @click.prevent="login"
+                                class="ma-2"
+                                outlined
+                        >
+                            <v-avatar left>
+                                <v-img src="picture/google-favicon.svg"/>
+                            </v-avatar>
+                            Google
+                        </v-chip>
+                    </div>
+                    <v-form
+                            ref="form"
+                            v-model="valid"
+                            v-if="login_type === 'inner'"
                     >
-                        <v-avatar left>
-                            <v-img src="picture/google-favicon.svg"/>
-                        </v-avatar>
-                        Google
-                    </v-chip>
-                </div>
-                <v-form
-                        ref="form"
-                        v-model="valid"
-                        v-if="login_type === 'inner'"
-                >
-                    <v-text-field
-                            v-model="email"
-                            :rules="emailRules"
-                            :label="email_field_text"
-                            required
-                            outlined
-                    ></v-text-field>
+                        <v-text-field
+                                v-model="email"
+                                :rules="emailRules"
+                                :label="email_field_text"
+                                required
+                                outlined
+                        ></v-text-field>
 
-                    <v-text-field
-                            v-model="password"
-                            :rules="passwordRules"
-                            :label="password_field_text"
-                            required
-                            outlined
-                    ></v-text-field>
+                        <v-text-field
+                                v-model="password"
+                                :rules="passwordRules"
+                                :label="password_field_text"
+                                required
+                                outlined
+                        ></v-text-field>
 
-                    <v-btn
-                            :disabled="!valid"
-                            @click.prevent="loginWithForm"
-                            color="primary"
-                    >
-                        {{login_btn_text}}
-                    </v-btn>
-                </v-form>
-            </v-list-item-content>
+                        <v-btn
+                                :disabled="!valid"
+                                @click.prevent="loginWithForm"
+                                color="primary"
+                        >
+                            {{login_btn_text}}
+                        </v-btn>
+                    </v-form>
+                </v-list-item-content>
 
 
-        </v-list-item>
+            </v-list-item>
 
-    </v-card>
+        </v-card>
+    </div>
 </template>
 
 <script>
@@ -74,7 +93,7 @@
             return {
                 //  LOGIN FORM TYPE
                 login_type: 'google',
-
+                main_title: ['Skill', 'Up', 'sys.'],
 
                 timer: 0,
                 welcome: 'Welcome!',
@@ -135,3 +154,17 @@
         }
     }
 </script>
+
+<style lang="scss">
+    .welcome-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo-color {
+        color: white;
+    }
+</style>

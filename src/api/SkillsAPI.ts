@@ -4,32 +4,52 @@ import {AxiosPromise} from "axios";
 import {PatchChange} from "@/models/payload/Patch";
 import {ISkillsUser} from "@/models/SkillsUser";
 import {IUserSkill} from "@/models/UserSkill";
+import {IUserSuccessCriterion} from "@/models/UserSuccessCriteria";
+import {IUser} from "@/models/User";
 
 export abstract class SkillsAPI {
 
     public static prefix: string = '/skills'
 
-    static async getAll(): Promise<ISkill[]>{
-        let response = await AxiosClient.get('/skills/skills');
-        return response.data;
+    public static getAll(): AxiosPromise<ISkill[]> {
+        return AxiosClient.get<ISkill[]>('/skills/skills');
     }
 
-    static async updateSkill(skill: ISkill): Promise<ISkill>{
-        let response = await AxiosClient.put(SkillsAPI.prefix + '/skills/' + skill.id, skill);
-        return response.data;
+    public static updateSkill(skill: ISkill): AxiosPromise<ISkill> {
+        return AxiosClient.put<ISkill>(SkillsAPI.prefix + '/skills/' + skill.id, skill);
     }
 
-    public static getUserSkill(userId: number, skillId: number ) : AxiosPromise<IUserSkill> {
-        return AxiosClient.get<IUserSkill>(SkillsAPI.prefix + "/users/" + userId + '/skill/' + skillId)
-    }
-
-    public static getUserById(userId: number) : AxiosPromise<ISkillsUser> {
+    public static getUserById(userId: number): AxiosPromise<ISkillsUser> {
         return AxiosClient.get<ISkillsUser>(SkillsAPI.prefix + "/users/" + userId);
     }
 
-    public static updateUserSkillsData(userId: number, fieldName: string, fieldValue: any) : AxiosPromise<ISkillsUser> {
-        let change = new PatchChange('replace', fieldName, fieldValue);
-        return AxiosClient.patch<ISkillsUser>(SkillsAPI.prefix + "/users/" + userId, [change]);
+    public static updateSkillsUserData(user: ISkillsUser): AxiosPromise<ISkillsUser> {
+        return AxiosClient.put<ISkillsUser>(SkillsAPI.prefix + "/users/" + user.id, user);
+    }
+
+    public static getSkillsUsersByIds(ids: number[]): AxiosPromise<ISkillsUser[]> {
+        return AxiosClient.post<ISkillsUser[]>(SkillsAPI.prefix + "/users", ids);
+    }
+
+    public static getUserSkill(userId: number, skillId: number): AxiosPromise<IUserSkill> {
+        return AxiosClient.get<IUserSkill>(SkillsAPI.prefix + "/users/" + userId + '/skills/' + skillId)
+    }
+
+    public static getUserSkills(user: IUser): AxiosPromise<IUserSkill[]> {
+        return AxiosClient.get<IUserSkill[]>(SkillsAPI.prefix + "/users/" + user.id + '/skills');
+    }
+
+    public static updateUserSkill(userSkill: IUserSkill): AxiosPromise<IUserSkill> {
+        return AxiosClient.put<IUserSkill>(SkillsAPI.prefix +
+            "/users/" + userSkill.userId + '/skills/' + userSkill.skill.id, userSkill);
+    }
+
+    public static getUserSkillsForStats(userId: number): AxiosPromise<Map<number, Map<string, IUserSkill>>> {
+        return AxiosClient.get<Map<number, Map<string, IUserSkill>>>(SkillsAPI.prefix + "/users/" + userId + '/skills/stats');
+    }
+
+    public static getLatestChangedUserSkill(userId: number): AxiosPromise<IUserSkill> {
+        return AxiosClient.get<IUserSkill>(SkillsAPI.prefix + "/users/" + userId + '/skills/latest')
     }
 
 }

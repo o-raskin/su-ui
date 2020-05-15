@@ -1,8 +1,6 @@
 <template>
     <div class="tab-max-size">
-        <v-card-subtitle v-if="!!this.user.position && !!this.user.grade">
-            {{this.user.position + ' - ' + this.user.grade}}
-        </v-card-subtitle>
+
         <v-card-text>
             <span v-if="!!this.user.mentor" class="text--secondary">
                 {{mentor_text + ': '}}
@@ -13,17 +11,26 @@
             </span>
 
             <span v-if="!!this.user.futurePromotionDate" class="text--secondary">
-                {{user_future_promotion_text + ': ' }} {{ this.user.futurePromotionDate | formatDate }}
+                {{user_future_promotion_text + ': ' }}
+                <span class="text--primary">
+                    {{ this.user.futurePromotionDate | formatDate }}
+                </span>
                 <br/>
             </span>
 
             <span v-if="!!this.user.lastPromotionDate" class="text--secondary">
-                {{user_last_promotion_text + ': '}} {{ this.user.lastPromotionDate | formatDate }}
+                {{user_last_promotion_text + ': '}}
+                <span class="text--primary">
+                    {{ this.user.lastPromotionDate | formatDate }}
+                </span>
                 <br/>
             </span>
 
             <span v-if="!!this.user.inCompanySince" class="text--secondary">
-                {{user_in_company_text + ': '}} {{this.user.inCompanySince | formatDate }}
+                {{user_in_company_text + ': '}}
+                <span class="text--primary">
+                    {{this.user.inCompanySince | formatDate }}
+                </span>
                 <br/>
             </span>
         </v-card-text>
@@ -51,7 +58,7 @@
                 name: 'UserProfile',
                 params:
                     {
-                        id: this.user.mentor.id.toString()
+                        id: this.user.mentor!.id.toString()
                     }
             });
         }

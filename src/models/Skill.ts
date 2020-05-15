@@ -1,6 +1,6 @@
 
 export interface ISuccessCriterion {
-    id?: number;
+    id: number;
     name: string;
     description: string;
 }
@@ -12,4 +12,17 @@ export interface ISkill {
     parent: ISkill;
     children: ISkill[];
     successCriteria: ISuccessCriterion[];
+    gradeId: number;
+    previousGradeId: number;
+}
+
+export class Skill implements ISkill{
+    id!: number;
+    name!: string;
+    description!: string;
+    parent!: ISkill;
+    children!: ISkill[];
+    successCriteria!: ISuccessCriterion[];
+    gradeId!: number;
+    previousGradeId!: number;
 }

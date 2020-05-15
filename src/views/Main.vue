@@ -1,11 +1,11 @@
 <template>
-    <v-container>
+    <v-container style="height: 100%; width: 100%">
 
-        <Header/>
+        <Header v-if="isAuthenticated"/>
 
         <Sidebar v-if="isAuthenticated"/>
 
-        <v-content>
+        <v-content style="height: 80%; width: 100%">
             <router-view/>
         </v-content>
 

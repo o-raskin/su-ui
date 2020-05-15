@@ -9,6 +9,36 @@
 
         <v-spacer></v-spacer>
 
+<!--        <v-menu v-if="isAuthenticated"-->
+<!--                bottom-->
+<!--                left-->
+<!--                :close-on-content-click="false">-->
+<!--            <template v-slot:activator="{ on }">-->
+<!--                <v-btn dark icon v-on="on">-->
+<!--                    <v-badge-->
+<!--                            color="green"-->
+<!--                            overlap-->
+<!--                            content="23"-->
+<!--                    >-->
+<!--                        <v-icon>-->
+<!--                            mdi-bell-->
+<!--                        </v-icon>-->
+<!--                    </v-badge>-->
+<!--                </v-btn>-->
+<!--            </template>-->
+
+<!--            <v-card>-->
+<!--                <v-list dense>-->
+<!--                    <v-divider></v-divider>-->
+
+<!--                    <v-list-item>-->
+<!--                        <v-list-item-title>-->
+<!--                            {{logout_btn_text}}-->
+<!--                        </v-list-item-title>-->
+<!--                    </v-list-item>-->
+<!--                </v-list>-->
+<!--            </v-card>-->
+<!--        </v-menu>-->
 
         <v-menu v-if="isAuthenticated"
                 bottom
@@ -39,33 +69,24 @@
 
                 <v-divider></v-divider>
 
+                <ProfileSettings/>
 
-                    <!--                    <v-list-item>-->
-                    <!--                        <v-list-item-action>-->
-                    <!--                            <v-switch v-model="hints" color="purple"></v-switch>-->
-                    <!--                        </v-list-item-action>-->
-                    <!--                        <v-list-item-title>Enable hints</v-list-item-title>-->
-                    <!--                    </v-list-item>-->
+                <v-divider></v-divider>
 
+                <v-list-item
 
-                    <ProfileSettings />
-
-                    <v-divider></v-divider>
-
-                    <v-list-item
-
-                            @click.prevent="logout"
-                    >
-                        <v-list-item-avatar>
-                            <v-icon>
-                                mdi-logout-variant
-                            </v-icon>
-                        </v-list-item-avatar>
-                        <v-list-item-title>
-                            {{logout_btn_text}}
-                        </v-list-item-title>
-                    </v-list-item>
-<!--                    <v-btn color="primary" text @click.prevent="logout">LOGOUT</v-btn>-->
+                        @click.prevent="logout"
+                >
+                    <v-list-item-avatar>
+                        <v-icon>
+                            mdi-logout-variant
+                        </v-icon>
+                    </v-list-item-avatar>
+                    <v-list-item-title>
+                        {{logout_btn_text}}
+                    </v-list-item-title>
+                </v-list-item>
+                <!--                    <v-btn color="primary" text @click.prevent="logout">LOGOUT</v-btn>-->
             </v-card>
         </v-menu>
     </v-app-bar>
@@ -77,7 +98,7 @@
     import {IProfile} from "@/models/Profile";
     import {IUser} from "@/models/User";
     import profileModule from "../../../store/profile-store";
-    import ProfileSettings from "@/components/home/ProfileSettings.vue"
+    import ProfileSettings from "@/components/profile/ProfileSettings.vue"
 
     @Component({
         components: {

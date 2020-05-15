@@ -12,7 +12,7 @@
     import StatusReport from "@/components/status-report/StatusReport.vue";
     import {IUser, User} from "@/models/User";
     import {UserAPI} from "@/api/UserAPI";
-    import UserProfile from "@/components/home/UserProfile.vue";
+    import UserProfile from "@/components/profile/UserProfile.vue";
 
     @Component({
         components: {

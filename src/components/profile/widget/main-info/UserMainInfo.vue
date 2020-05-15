@@ -4,24 +4,50 @@
             <div>
                 <v-card-title class="headline pb-0">
                     {{user.name}}
+                    <!--    EXTRA ACTIONS   -->
+                    <div v-if="!isAuthorizedUserProfile && !isInWhitelist">
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                        v-on="on"
 
-                    <v-btn v-if="!isAuthorizedUserProfile && !isInWhitelist"
-                           icon
-                           @click="addWhitelistUser()"
-                    >
-<!--                            <v-img max-width="20px" src="/picture/star.svg"/>-->
-                                                <v-icon small
-                                                >
-                                                    mdi-star
-                                                </v-icon>
-                    </v-btn>
+                                        icon
+                                        @click="addWhitelistUser()"
+                                >
+                                    <v-icon small
+                                    >
+                                        mdi-star
+                                    </v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Add to whitelist</span>
+                        </v-tooltip>
+                    </div>
+
+                    <div v-if="!isAuthorizedUserProfile && isWard">
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                        v-on="on"
+                                        icon
+                                        @click="goToSubordinateSkillBoard()"
+                                >
+                                    <v-icon small>
+                                        mdi-format-list-checks
+                                    </v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Review Skill board</span>
+                        </v-tooltip>
+                    </div>
+
                 </v-card-title>
 
-                <div class="ml-2 mr-2" v-if="isAuthorizedUserProfile">
+                <div class="ml-4 mr-2 mb-2" v-if="isAuthorizedUserProfile">
                     <div class="status-label" v-if="!editing">
                         <span
                                 @click="enableEditingStatus"
-                                class="pa-2 body-2 text--secondary"
+                                class="body-2 text--secondary"
                         >
                             {{profileStatus}}
                         </span>
@@ -30,9 +56,11 @@
                             ref="form"
                             v-model="validStatus"
                             lazy-validation
-                            class="status-edit pa-2 custom-card-border flex-wrap d-flex"
+                            class="my-auto custom-box-shadow status-edit custom-card-border flex-wrap d-flex"
                             v-if="editing">
                         <v-text-field
+                                class="mt-1 pl-1 edit-status-field"
+                                hide-details
                                 outlined
                                 counter="50"
                                 solo
@@ -42,7 +70,6 @@
                                 v-model="profile.status"
                                 :rules="this.statusRules"
                         ></v-text-field>
-                        <!--                        <input v-model="profile.status" class="input custom-card-border"/>-->
                         <v-btn dark rounded icon @click="cancelTempStatus">
                             <v-icon>mdi-close-circle</v-icon>
                         </v-btn>
@@ -53,13 +80,14 @@
                         </v-btn>
                     </v-form>
                 </div>
+
                 <div class="ml-2 mr-2" v-if="!isAuthorizedUserProfile">
                    <span class="pa-2 body-2 text--secondary">
                        {{profileStatus}}
                    </span>
                 </div>
 
-                <v-tabs vertical grow>
+                <v-tabs vertical grow class="main-info-widget-content-height overflow-y-auto">
                     <v-tabs-slider></v-tabs-slider>
 
                     <v-tab>
@@ -93,9 +121,9 @@
     import {IProfile, Profile} from "@/models/Profile";
     import {ProfileAPI} from "@/api/ProfileAPI";
     import {UserAPI} from "@/api/UserAPI";
-    import UserProfileTab from "@/components/home/widget/main-info/UserProfileTab.vue";
-    import UserFollowersTab from "@/components/home/widget/main-info/UserFollowersTab.vue";
-    import UserFollowingTab from "@/components/home/widget/main-info/UserFollowingTab.vue";
+    import UserProfileTab from "@/components/profile/widget/main-info/UserProfileTab.vue";
+    import UserFollowersTab from "@/components/profile/widget/main-info/UserFollowersTab.vue";
+    import UserFollowingTab from "@/components/profile/widget/main-info/UserFollowingTab.vue";
     import {State} from "vuex-class";
     import profileModule from "../../../../../store/profile-store";
 
@@ -124,10 +152,8 @@
         public tempValue: string = this.profile.status;
         public validStatus: boolean = false;
 
-        get profileStatus() : string {
-            debugger
+        get profileStatus(): string {
             if ((!this.profile.status || this.profile.status === '') && this.isAuthorizedUserProfile) {
-                debugger
                 return '...'
             }
             return this.profile.status;
@@ -142,9 +168,25 @@
             return i !== -1;
         }
 
+        get isWard(): boolean {
+            return !!this.user.mentor && this.currentUser.id === this.user.mentor.id;
+        }
+
         public addWhitelistUser() {
             this.currentUserProfile.whitelist.push(this.user);
             this.$store.dispatch('updateProfile', this.currentUserProfile)
+        }
+
+        public goToSubordinateSkillBoard() {
+            if (this.isWard) {
+                this.$router.push({
+                    name: 'UserSkillBoard',
+                    params:
+                        {
+                            id: this.user.id.toString()
+                        }
+                });
+            }
         }
 
         public enableEditingStatus() {
@@ -180,5 +222,21 @@
 
     .status-edit {
         background: #1976d2;
+    }
+
+    .custom-box-shadow {
+        box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    }
+
+    .edit-status-field {
+        font-size: 10pt;
+
+        ::v-deep .v-input__slot {
+            min-height: 5px !important;
+        }
+    }
+
+    .main-info-widget-content-height {
+        max-height: 320px;
     }
 </style>

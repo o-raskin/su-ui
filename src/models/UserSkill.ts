@@ -1,19 +1,23 @@
+import {ISimpleSkill} from "@/models/SimpleSkill";
 
 export interface IUserSkill {
 
-    skillId?: number;
     userId?: number;
+    skill: ISimpleSkill;
     startDate: Date | string | null;
     endDate: Date | string | null;
     status: string;
+    editorId: number | undefined;
+    lastEditDate: Date | string | null;
 }
 
 export class UserSkill implements IUserSkill{
 
-    skillId?: number;
     userId?: number;
+    skill!: ISimpleSkill;
     startDate!: Date | string | null;
     endDate!: Date | string | null;
     status!: string;
-
+    editorId: number | undefined;
+    lastEditDate!: Date | string | null;
 }

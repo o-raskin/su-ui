@@ -4,19 +4,39 @@
             <v-list-item>
                 <!--    Status  -->
 
-                <v-chip :key="index"
-                        v-for="(s, index) in this.status_list"
-                        v-if="userSkillData.status === s.id"
-                        :color="s.color"
+                <div :key="index"
+
+                     v-for="(s, index) in this.status_list"
+                     v-if="userSkillData.status === s.id">
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-chip v-on="on"
+                                    :color="s.color"
+                                    :text-color="!isMandatory ? 'white' : 'black'"
+                                    label
+                                    small
+                                    :value="s.text"
+                                    :outlined="isMandatory"
+                            >
+                                <v-avatar  left>
+                                    <v-icon small>{{s.icon}}</v-icon>
+                                </v-avatar>
+                                {{s.text}}
+                            </v-chip>
+                        </template>
+                        <span>{{s.tooltipText}}</span>
+                    </v-tooltip>
+                </div>
+
+                <!--    GRADE NAME   -->
+                <v-chip v-if="!!skillGradeName"
+                        color="primary"
                         text-color="white"
                         label
                         small
-                        :value="s.text"
+                        class="ml-1"
                 >
-                    <v-avatar left>
-                        <v-icon small>{{s.icon}}</v-icon>
-                    </v-avatar>
-                    {{s.text}}
+                    {{skillGradeName}}
                 </v-chip>
             </v-list-item>
 
@@ -58,8 +78,10 @@
             <!--    Actions -->
             <v-card-actions class="mx-2 my-1">
 
+                <!--    USER ACTIONS    -->
+
                 <v-btn
-                        v-if="!isCompleted && allSuccessCriteriaCompleted"
+                        v-if="!isWard && isReadyToComplete"
                         @click="completeLearnSkill()"
                         dark
                         color="green"
@@ -69,18 +91,58 @@
                 </v-btn>
 
                 <v-btn
-                        v-if="!isInProgress"
+                        v-if="!isWard && canBeLearned"
+                        @click="startLearning()"
                         class="custom-card-border"
+                        color="primary"
+                        dark
                         elevation="0">
                     learn
                 </v-btn>
 
                 <v-btn
-                        v-if="isEnableToStop"
+                        v-if="!isWard && isEnableToStop"
+                        @click="cancelLearnSkill()"
                         class="custom-card-border"
+                        dark
+                        color="red"
                         elevation="0">
                     stop learning
                 </v-btn>
+
+                <!--    MENTOR ACTIONS    -->
+
+                <v-btn
+                        v-if="isWard && isPending"
+                        @click="rejectSkill()"
+                        dark
+                        color="red"
+                        class="custom-card-border"
+                        elevation="0">
+                    REJECT
+                </v-btn>
+
+                <v-btn
+                        v-if="isWard && isPending"
+                        @click="approveSkill()"
+                        dark
+                        color="green"
+                        class="custom-card-border"
+                        elevation="0">
+                    APPROVE
+                </v-btn>
+
+                <v-btn
+                        v-if="isWard && isApproved"
+                        @click="relearnSkill()"
+                        dark
+                        color="red"
+                        class="custom-card-border"
+                        elevation="0">
+                    RELEARN
+                </v-btn>
+
+
             </v-card-actions>
 
         </v-card>
@@ -90,7 +152,10 @@
                 <v-toolbar-title class="subtitle-2">Success criteria</v-toolbar-title>
             </v-toolbar>
 
-            <v-list outlined dense>
+            <v-list
+                    outlined
+                    dense
+            >
                 <v-list-item-group
                         v-model="selectedSuccessCriteria"
                         multiple
@@ -98,7 +163,9 @@
                     <template v-for="(successCriterion, index) in this.skill.successCriteria">
                         <v-list-item :key="successCriterion.name"
                                      v-on:click="successCriterionClick(successCriterion)"
-                                     inactive>
+                                     inactive
+                                     :disabled="!canChangeSuccessCriterion"
+                        >
                             <template>
                                 <v-list-item-content>
                                     <v-list-item-title class="subtitle-2"
@@ -108,11 +175,12 @@
                                 </v-list-item-content>
 
                                 <v-list-item-action>
-                                    <v-list-item-action-text v-if="successCriterion.finishDate !== null">
-                                        {{ successCriterion.finishDate | formatDate }}
+                                    <v-list-item-action-text
+                                            v-if="userSuccessCriterionById(successCriterion.id).finishDate">
+                                        {{ userSuccessCriterionById(successCriterion.id).finishDate | formatDate }}
                                     </v-list-item-action-text>
                                     <v-icon
-                                            v-if="!successCriterion.achieved"
+                                            v-if="!userSuccessCriterionById(successCriterion.id).achieved"
                                             color="grey lighten-1"
                                     >
                                         mdi-power-off
@@ -148,10 +216,11 @@
     import {IUserSkill, UserSkill} from "@/models/UserSkill";
     import {State} from "vuex-class";
     import {IUser} from "@/models/User";
+    import {IUserSuccessCriterion, UserSuccessCriterion} from "@/models/UserSuccessCriteria";
+    import {IGrade} from "@/models/Grade";
 
     @Component({
-        components: {
-        },
+        components: {},
     })
     export default class SkillCard extends Vue {
 
@@ -159,123 +228,260 @@
         public readonly currentUser!: IUser;
 
         @Prop()
+        public user!: IUser;
+
+        @Prop()
         public skill!: ISkill;
 
+        @Prop()
+        public requiredForGrade!: boolean;
+
+        @Prop()
+        public grades!: IGrade[];
+
         public userSkillData: IUserSkill = new UserSkill();
+
+        public userSuccessCriteriaData: IUserSuccessCriterion[] = [];
+
+        public selectedSuccessCriteria: number[] = [];
 
         data() {
             return {
                 successCriteria: [],
-                selectedSuccessCriteria: [],
                 status_list: [
                     {
                         id: 'NOT_MANDATORY',
                         text: 'NOT MANDATORY',
-                        color: 'grey',
+                        color: 'black',
                         icon: 'mdi-power-off',
+                        tooltipText: 'Skill not mandatory to know right now'
                     },
                     {
                         id: 'NEED_TO_KNOW',
                         text: 'NEED TO KNOW',
-                        color: 'primary',
+                        color: 'red',
                         icon: 'mdi-alert-circle',
+                        tooltipText: 'Need to learn this skill to get the next grade'
                     },
                     {
                         id: 'IN_PROGRESS',
                         text: 'IN PROGRESS',
-                        color: 'grey',
+                        color: 'primary',
                         icon: 'mdi-dots-horizontal-circle',
+                        tooltipText: 'In progress of learning skill'
                     },
                     {
                         id: 'PENDING',
                         text: 'PENDING',
                         color: 'orange',
                         icon: 'mdi-help-circle',
+                        tooltipText: 'Mentor need to approve grade or skill'
                     },
                     {
                         id: 'APPROVED',
                         text: 'APPROVED',
                         color: 'green',
                         icon: 'mdi-check-circle',
+                        tooltipText: 'Approved by mentor'
                     },
                 ],
 
             }
         }
 
+        @Watch("user")
+        public watchingForUserChange() {
+            this.fetchUserSkillData()
+            this.fetchUserSuccessCriteriaData()
+        }
+
         @Watch("skill")
         public updateSkillData() {
-            this.mounted()
+            this.fetchUserSkillData()
+            this.fetchUserSuccessCriteriaData()
         }
 
         mounted() {
             this.fetchUserSkillData()
+            this.fetchUserSuccessCriteriaData()
+        }
+
+        public userSuccessCriterionById(successCriterionId: number): IUserSuccessCriterion | undefined {
+            return this.userSuccessCriteriaData
+                .find(usc => usc.successCriterionId === successCriterionId)
         }
 
         //  ACTIONS
 
+        //  MENTOR
+        public rejectSkill() {
+            this.userSkillData.status = 'IN_PROGRESS';
+            this.userSkillData.endDate = null;
+            this.userSkillData.editorId = this.currentUser.id;
+            this.userSkillData.lastEditDate = new Date().toISOString().slice(0, 10);
+            this.updateSkill()
+        }
+
+        public approveSkill() {
+            this.userSkillData.status = 'APPROVED';
+            this.userSkillData.endDate = new Date().toISOString().slice(0, 10);
+            this.userSkillData.editorId = this.currentUser.id;
+            this.userSkillData.lastEditDate = new Date().toISOString().slice(0, 10);
+            this.updateSkill()
+        }
+
+        public relearnSkill() {
+            if (this.requiredForGrade) {
+                this.userSkillData.status = 'NEED_TO_KNOW'
+            } else {
+                this.userSkillData.status = 'NOT_MANDATORY'
+            }
+            this.userSkillData.endDate = null;
+            this.userSkillData.editorId = this.currentUser.id;
+            this.userSkillData.lastEditDate = new Date().toISOString().slice(0, 10);
+            this.updateSkill()
+        }
+
+        //  USER
+
         public startLearning() {
-            //TODO: add here logic for change UserSkill status to IN_PROGRESS!
+            this.userSkillData.status = 'IN_PROGRESS';
+            this.userSkillData.startDate = new Date().toISOString().slice(0, 10);
+            this.updateSkill()
+        }
+
+        public cancelLearnSkill() {
+            if (this.requiredForGrade) {
+                this.userSkillData.status = 'NEED_TO_KNOW'
+            } else {
+                this.userSkillData.status = 'NOT_MANDATORY'
+            }
+            this.userSkillData.startDate = null
+            this.updateSkill()
+        }
+
+
+        public completeLearnSkill() {
+            this.userSkillData.status = 'PENDING';
+            this.userSkillData.endDate = new Date().toISOString().slice(0, 10);
+            this.updateSkill()
         }
 
         //  API
 
+        public updateSkill() {
+            SkillsAPI.updateUserSkill(this.userSkillData)
+                .then(r => this.userSkillData = r.data)
+        }
+
         public fetchUserSkillData() {
-            SkillsAPI.getUserSkill(this.currentUser.id, this.skill.id)
+            SkillsAPI.getUserSkill(this.user.id, this.skill.id)
                 .then(r => {
-                    debugger
                     this.userSkillData = r.data;
                 })
         }
 
-        // public successCriterionClick(val : ISuccessCriterion) {
-        //
-        //         val.achieved = !val.achieved;
-        //
-        //         if (val.achieved === false) {
-        //             val.finishDate = null
-        //         } else {
-        //             val.finishDate =new Date().toISOString().slice(0, 10)
-        //         }
-        //         SuccessCriterionAPI.update(val);
-        // }
-        //
-        // public completeLearnSkill() {
-        //     this.skill.status = 'PENDING';
-        //     SkillApi.updateSkill(this.skill)
-        //         .then(res => {
-        //             this.skill = res;
-        //         })
-        // }
+        public fetchUserSuccessCriteriaData() {
+            SuccessCriterionAPI.getAllSuccessCriterionByUserAndSkill(this.user.id, this.skill.id)
+                .then(r => {
+                    this.userSuccessCriteriaData = r.data;
+                })
+        }
+
+        public successCriterionClick(skillSuccessCriterion: ISuccessCriterion) {
+
+            let userSuccessCriterion = this.userSuccessCriteriaData
+                .find(usc => usc.successCriterionId === skillSuccessCriterion.id);
+
+            if (!userSuccessCriterion) {
+
+                userSuccessCriterion =
+                    new UserSuccessCriterion(skillSuccessCriterion.id, this.user.id,
+                        new Date().toISOString().slice(0, 10), true);
+            } else {
+                userSuccessCriterion.achieved = !userSuccessCriterion.achieved;
+                if (!userSuccessCriterion.achieved) {
+                    userSuccessCriterion.finishDate = null
+                } else {
+                    userSuccessCriterion.finishDate = new Date().toISOString().slice(0, 10)
+                }
+            }
+
+            debugger
+            SuccessCriterionAPI.updateUserSuccessCriterion(userSuccessCriterion)
+                .then(r => {
+                    let oldSCIndex = this.userSuccessCriteriaData
+                        .findIndex(usc => usc.successCriterionId === r.data.successCriterionId)
+                    this.userSuccessCriteriaData.splice(oldSCIndex, 1, r.data);
+                });
+        }
 
         //  STATUS HANDLING
 
-        get isNotLearned() : boolean {
-            return this.userSkillData.status === 'NOT_MANDATORY' ||
-                this.userSkillData.status === 'NEED_TO_KNOW';
+        get isMandatory(): boolean {
+            return this.userSkillData.status === 'NOT_MANDATORY';
         }
 
-        get isInProgress() : boolean {
-            return this.isNotLearned && this.userSkillData.status === 'IN_PROGRESS';
+        get isNeedToKnow(): boolean {
+            return this.userSkillData.status === 'NEED_TO_KNOW';
         }
 
-        get isCompleted() : boolean {
-            return !this.isInProgress &&
-                (this.userSkillData.status === 'APPROVED' || this.userSkillData.status === 'PENDING');
+        get isInProgress(): boolean {
+            return this.userSkillData.status === 'IN_PROGRESS';
         }
 
-        get isEnableToStop() : boolean {
-            return this.isInProgress && this.userSkillData.status !== '';
+        get isPending(): boolean {
+            return this.userSkillData.status === 'PENDING';
         }
 
-        // get allSuccessCriteriaCompleted() : boolean {
-        //     let i = this.skill.successCriteria.findIndex(sc => !sc.achieved);
-        //     return i === -1;
-        // }
+        get isApproved(): boolean {
+            return this.userSkillData.status === 'APPROVED';
+        }
+
+        //  CHECKS
+
+        get isWard(): boolean {
+            return !!this.user.mentor && this.currentUser.id === this.user.mentor.id;
+        }
+
+        get canChangeSuccessCriterion(): boolean {
+            return !this.isPending && !this.isApproved;
+        }
+
+        get canBeLearned(): boolean {
+            return !this.isPending && !this.isApproved && !this.isInProgress;
+        }
+
+        get isReadyToComplete(): boolean {
+            return this.allSuccessCriteriaCompleted && this.isInProgress;
+        }
+
+        get isEnableToStop(): boolean {
+            return !this.requiredForGrade && this.isInProgress;
+        }
+
+        get allSuccessCriteriaCompleted(): boolean {
+            if (this.userSuccessCriteriaData.length !== this.skill.successCriteria.length) {
+                return false;
+            }
+            let i = this.userSuccessCriteriaData.findIndex(sc => !sc.achieved);
+            return i === -1;
+        }
+
+        //  OTHER
+
+        get skillGradeName() {
+            debugger
+            let skillGrade = this.grades.find(g => g.id === this.skill.gradeId);
+            if (!!skillGrade) {
+                return skillGrade.name.toUpperCase();
+            }
+            return undefined;
+        }
 
         get defaultAvatar() {
-            var skillName = this.skill.name
-            var uppercaseContent = skillName.replace(/[^A-Z]/g, "")
+            let skillName = this.skill.name
+            let uppercaseContent = skillName.replace(/[^A-Z]/g, "")
 
             if (uppercaseContent.length >= 2) skillName = uppercaseContent;
 

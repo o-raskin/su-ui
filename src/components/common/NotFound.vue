@@ -35,9 +35,9 @@
     import StatusReport from "@/components/status-report/StatusReport.vue";
     import Login from "@/components/auth/login/Login.vue";
     import {UserAPI} from "@/api/UserAPI";
-    import UserActivity from "@/components/home/widget/UserActivity";
-    import UserMainInfo from "@/components/home/widget/main-info/UserMainInfo";
-    import InProgressList from "@/components/home/widget/InProgressList";
+    import UserActivity from "@/components/profile/widget/Activity";
+    import UserMainInfo from "@/components/profile/widget/main-info/UserMainInfo";
+    import InProgressList from "@/components/profile/widget/GradeProgress";
     import {ProfileAPI} from "@/api/ProfileAPI";
     import Profile from "@/models/Profile";
 

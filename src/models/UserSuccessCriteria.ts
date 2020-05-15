@@ -1,16 +1,16 @@
 
 export interface IUserSuccessCriterion {
 
-    successCriterionId?: number;
-    userId?: number;
+    successCriterionId: number;
+    userId: number;
     finishDate: Date | string | null;
     achieved: boolean;
 }
 
 export class UserSuccessCriterion implements IUserSuccessCriterion{
 
-    successCriterionId?: number;
-    userId?: number;
+    successCriterionId: number;
+    userId: number;
     finishDate: Date | string | null;
     achieved: boolean;
 

@@ -1,25 +1,43 @@
 <template>
     <v-container>
-        <!--        <v-toolbar dense short flat>-->
+        <v-toolbar dense short flat>
 
-        <!--            <v-toolbar-title>Skill Board</v-toolbar-title>-->
 
-        <!--            <v-spacer/>-->
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn dark @click="goToUserProfile()" icon v-on="on">
+                        <v-avatar size="30">
+                            <v-img :src="ownerSkillBoard.imageUrl"/>
+                        </v-avatar>
+                    </v-btn>
+                </template>
+                <span>Go to user profile</span>
+            </v-tooltip>
 
-        <!--&lt;!&ndash;            <v-btn icon>&ndash;&gt;-->
-        <!--&lt;!&ndash;                <v-icon>mdi-plus</v-icon>&ndash;&gt;-->
-        <!--&lt;!&ndash;            </v-btn>&ndash;&gt;-->
+            <v-toolbar-title class="pl-0">
+                {{ownerSkillBoard.name + '\'s'}}
+                Skill Board
+                <span class="caption text--secondary" v-if="this.latestEditedUserSkill.editorId">
+                    {{'(last review: '}}
+                    {{latestEditedUserSkill.lastEditDate | formatDate}}
+                    {{' by ' + latestEditor.name + ")"}}
+                </span>
+            </v-toolbar-title>
 
-        <!--&lt;!&ndash;            <v-btn icon>&ndash;&gt;-->
-        <!--&lt;!&ndash;                <v-icon>mdi-trash-can-outline</v-icon>&ndash;&gt;-->
-        <!--&lt;!&ndash;            </v-btn>&ndash;&gt;-->
+            <v-spacer/>
 
-        <!--            <v-btn icon>-->
-        <!--                <v-icon>mdi-dots-vertical</v-icon>-->
-        <!--            </v-btn>-->
-        <!--        </v-toolbar>-->
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn v-on="on" icon @click="goToUserSkillsTable()">
+                        <v-icon>mdi-file-table-box</v-icon>
+                    </v-btn>
+                </template>
+                <span>Table view</span>
+            </v-tooltip>
 
-        <!--        <v-divider/>-->
+        </v-toolbar>
+
+        <v-divider/>
 
         <v-row>
             <v-col>
@@ -36,28 +54,57 @@
                                 clear-icon="mdi-close-circle-outline"
                         ></v-text-field>
                         <v-container class="d-flex pa-0 ma-0">
-                            <v-checkbox
-                                    v-model="caseSensitive"
-                                    dark
-                                    hide-details
-                                    label="case sensitive"
-                            ></v-checkbox>
-                            <v-spacer></v-spacer>
-                            <v-switch
-                                    class="mr-2 ml-2"
-                                    v-model="needForGrade"
-                                    dark
-                                    hide-details
-                                    label="required for grade"
-                            >for grade</v-switch>
+                            <div style="width: 75%">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-checkbox
+                                                v-on="on"
+                                                v-model="caseSensitive"
+                                                dark
+                                                hide-details
+                                                label="case sensitive"
+                                        ></v-checkbox>
+                                    </template>
+                                    <span>Turn on case sensitive filter</span>
+                                </v-tooltip>
+                            </div>
+                            <div>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-checkbox
+                                                v-on="on"
+                                                v-model="needForGrade"
+                                                dark
+                                                hide-details
+                                                label="next grade"
+                                        ></v-checkbox>
+                                    </template>
+                                    <span>Show only skill required for next grade</span>
+                                </v-tooltip>
+                                <v-spacer/>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-checkbox
+                                                v-on="on"
+                                                v-model="relearn"
+                                                dark
+                                                hide-details
+                                                label="relearn"
+                                        ></v-checkbox>
+                                    </template>
+                                    <span>Show only skills, that need to be relearned</span>
+                                </v-tooltip>
+                            </div>
                         </v-container>
+
+
                     </v-sheet>
                     <v-treeview
                             v-model="selection"
-                            :items="convertToTree(skills)"
+                            :items="displayedSkills"
                             :search="search"
                             :filter="filter"
-                            :selection-type="selectionType"
+                            selection-type="leaf"
                             activatable
                             hoverable
                             v-on:update:active="setActive"
@@ -66,13 +113,18 @@
             </v-col>
             <v-divider vertical/>
             <v-col>
-                <template v-if="activeSkill === null">
+                <template v-if="this.activeSkill === null">
                     <p class="title grey--text text--lighten-1 font-weight-light">
                         Choose skill...
                     </p>
                 </template>
                 <template v-else>
-                    <SkillCard :skill="activeSkill"/>
+                    <SkillCard
+                            :skill="activeSkill"
+                            :requiredForGrade="requiredForNextGrade(activeSkill)"
+                            :grades="grades"
+                            :user="ownerSkillBoard"
+                    />
                 </template>
             </v-col>
         </v-row>
@@ -81,84 +133,224 @@
 </template>
 
 
-<script>
+<script lang="ts">
+    import {Component, Vue, Prop, Watch} from 'vue-property-decorator';
     import {SkillsAPI} from "@/api/SkillsAPI";
-    import SkillCard from './SkillCard';
-    import _ from 'lodash';
+    import SkillCard from "@/components/skills/SkillCard.vue";
+    import {ISkillsUser, SkillsUser} from "@/models/SkillsUser";
+    import {ISkill} from "@/models/Skill";
+    import {State} from "vuex-class";
+    import {IUser, User} from "@/models/User";
+    import {IGrade} from "@/models/Grade";
+    import {SkillsGradeAPI} from "@/api/SkillsGradeAPI";
+    import {UserAPI} from "@/api/UserAPI";
+    import {IUserSkill, UserSkill} from "@/models/UserSkill";
 
-    export default {
-        name: 'SkillBoard',
+    @Component({
         components: {
             SkillCard
         },
+    })
+    export default class SkillBoard extends Vue {
+
+        @State((state) => state.currentUser)
+        public readonly currentUser!: IUser;
+
+        public user: IUser = new User();
+
+        public grades: IGrade[] = [];
+        public allUserGrades: IGrade[] = [];
+        public skillsUser: ISkillsUser = new SkillsUser();
+        public activeSkill: ISkill | null | undefined = null;
+
+        public latestEditedUserSkill: IUserSkill = new UserSkill();
+        public latestEditor: IUser = new User();
+
+        public userSkillsData: IUserSkill[] = [];
+        public skills: ISkill[] = [];
+        public selection: number[] = [];
+
+        public search: string = '';
+        public caseSensitive: boolean = false;
+        public needForGrade: boolean = false;
+        public relearn: boolean = false;
+
         data() {
             return {
-                activeSkill: null,
-                skills: [],
-                selection: [],
-                selectionType: 'leaf',
-
-                //  Filter
-                search: null,
-                caseSensitive: false,
-                needForGrade: false,
-
-                // Strings
                 filter_default_value: 'Start typing to filter...'
             }
-        },
-        methods: {
-            setActive(id) {
-                if (id.length === 0 || id[0] === null) {
-                    this.activeSkill = null
-                } else {
-                    for (let skill of this.skills) {
-                        if (skill.id === id[0]) {
-                            this.activeSkill = skill
-                        }
-                    }
-                }
-            },
-            convertToTree(arr) {
-                var tree = [],
-                    mappedArr = {},
-                    arrElem,
-                    mappedElem;
+        }
 
-                // First map the nodes of the array to an object -> create a hash table.
-                for (var i = 0, len = arr.length; i < len; i++) {
-                    arrElem = arr[i];
-                    mappedArr[arrElem.id] = arrElem;
-                    mappedArr[arrElem.id]['children'] = [];
-                }
-
-                for (var id in mappedArr) {
-                    if (mappedArr.hasOwnProperty(id)) {
-                        mappedElem = mappedArr[id];
-                        // If the element is not at the root level, add it to its parent array of children.
-                        if (mappedElem.parentId) {
-                            mappedArr[mappedElem['parentId']]['children'].push(mappedElem);
-                        }
-                        // If the element is at the root level, add it to first level elements array.
-                        else {
-                            tree.push(mappedElem);
-                        }
-                    }
-                }
-                return tree;
+        @Watch("needForGrade")
+        public watchNeedForGradeState() {
+            if (this.needForGrade && this.relearn) {
+                this.relearn = false;
             }
-        },
-        computed: {
-            filter() {
-                return this.caseSensitive
-                    ? (skill, search, name) => skill[name].indexOf(search) > -1
-                    : undefined
-            },
-        },
+        }
 
-        async mounted() {
-            this.skills = await SkillsAPI.getAll();
-        },
+        @Watch("relearn")
+        public watchRelearnState(newState: boolean, oldState: boolean) {
+            if (newState && this.needForGrade) {
+                this.needForGrade = false;
+            }
+        }
+
+        public setActive(idsList: number[]) {
+            if (idsList.length === 0 || !idsList[0]) {
+                this.activeSkill = null
+            } else {
+                this.activeSkill = this.skills.find(s => s.id === idsList[0]);
+            }
+        }
+
+        public convertToTree(skills: ISkill[]) {
+            let tree = [];
+            let mappedArr = [];
+            let arrElem: any;
+            let mappedElem;
+
+            // First map the nodes of the array to an object -> create a hash table.
+            for (let i = 0, len = skills.length; i < len; i++) {
+                arrElem = skills[i];
+                mappedArr[arrElem.id] = arrElem;
+                mappedArr[arrElem.id]['children'] = [];
+            }
+
+            for (let id in mappedArr) {
+                if (mappedArr.hasOwnProperty(id)) {
+                    mappedElem = mappedArr[id];
+                    // If the element is not at the root level, add it to its parent array of children.
+                    if (mappedElem.parentId) {
+                        mappedArr[mappedElem['parentId']]['children'].push(mappedElem);
+                    }
+                    // If the element is at the root level, add it to first level elements array.
+                    else {
+                        tree.push(mappedElem);
+                    }
+                }
+            }
+            return tree;
+        }
+
+        /**
+         *  under our grade: -1 and below
+         *  our grade: 0
+         *  for next grade: 1
+         *  higher grades: 2 and higher
+         */
+        public requiredForNextGrade(skill: ISkill): boolean {
+            if (!!this.skillsUser.grade) {
+                return skill.previousGradeId === this.skillsUser.grade.id
+            }
+            return false;
+        }
+
+        public isRelearnedSkill(skill: ISkill): boolean {
+            let us = this.userSkillsData.find(us => us.skill.id === skill.id);
+            if (us) {
+                return us.status !== 'APPROVED' && (this.allUserGrades.map(g => g.id).indexOf(skill.gradeId) !== -1);
+            }
+            return false;
+        }
+
+        @Watch("ownerSkillBoardId")
+        public updateDataForUser() {
+            this.fetchAllSkillsUserData()
+        }
+
+        public goToUserProfile() {
+            this.$router.push({name: 'UserProfile'})
+        }
+
+        public goToUserSkillsTable() {
+            this.$router.push(
+                {
+                    name: 'UserSkillTable',
+                    params: {
+                        id: this.ownerSkillBoardId.toString()
+                    }
+                })
+        }
+
+        public fetchAllSkillsUserData() {
+            SkillsAPI.getAll()
+                .then(r => this.skills = r.data)
+
+            SkillsAPI.getUserSkills(this.user)
+                .then(r => this.userSkillsData = r.data);
+
+            SkillsAPI.getUserById(this.ownerSkillBoardId)
+                .then(r => this.skillsUser = r.data);
+
+            SkillsGradeAPI.getAll()
+                .then(r => this.grades = r.data);
+
+            SkillsGradeAPI.getPreviousUserGrades(this.user)
+                .then(r => {
+                    this.allUserGrades = r.data
+                });
+
+            SkillsAPI.getLatestChangedUserSkill(this.ownerSkillBoardId)
+                .then(r => {
+                    this.latestEditedUserSkill = r.data
+
+                    if (r.data.userId) {
+                        UserAPI.getUserById(r.data.userId)
+                            .then(r => this.latestEditor = r.data);
+                    }
+                })
+        }
+
+        get displayedSkills(): ISkill[] {
+            let displayedSkills = this.skills;
+
+            if (this.needForGrade) {
+                displayedSkills = this.skills.filter(s => this.requiredForNextGrade(s))
+            }
+
+            if (this.relearn) {
+                displayedSkills = this.skills.filter(s => this.isRelearnedSkill(s))
+            }
+
+            return this.convertToTree(displayedSkills)
+        }
+
+        get filter() {
+            return this.caseSensitive
+                ? (skill: any, search: any, name: any) => skill[name].indexOf(search) > -1
+                : undefined
+        }
+
+        get isAuthorizedUserProfile(): boolean {
+            return !this.$route.params.id || +this.$route.params.id === this.currentUser.id;
+        }
+
+        get ownerSkillBoardId(): number {
+            return !!this.$route.params.id ? +this.$route.params.id : this.currentUser.id
+        }
+
+        get ownerSkillBoard(): IUser {
+            return !this.isAuthorizedUserProfile ? this.user : this.currentUser
+        }
+
+        mounted() {
+
+            if (!this.isAuthorizedUserProfile) {
+
+                UserAPI.getUserById(this.ownerSkillBoardId)
+                    .then(r => {
+                        this.user = r.data
+                        // check that user allowed to be on page
+                        if (!this.user.mentor || !this.user.mentor.id || this.user.mentor.id !== this.currentUser.id) {
+                            this.$router.push({name: 'Forbidden'})
+                        } else {
+                            this.fetchAllSkillsUserData()
+                        }
+                    })
+            } else {
+                this.fetchAllSkillsUserData()
+            }
+        }
 
 
     }

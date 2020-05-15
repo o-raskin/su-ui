@@ -4,18 +4,13 @@ export interface IGrade {
     name: string;
     description: string;
     positionId: number;
+    nextGradeId: number;
 }
 
 export class Grade implements IGrade {
-    id: number;
-    name: string;
-    description: string;
-    positionId: number;
-
-    constructor(id: number, name: string, description: string, positionId: number) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.positionId = positionId;
-    }
+    id!: number;
+    name!: string;
+    description!: string;
+    positionId!: number;
+    nextGradeId!: number;
 }

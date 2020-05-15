@@ -45,4 +45,7 @@
         border: thin solid rgba(0, 0, 0, 0.12);
         border-radius: 4px;
     }
+    .widget-content-height {
+        max-height: 235px;
+    }
 </style>

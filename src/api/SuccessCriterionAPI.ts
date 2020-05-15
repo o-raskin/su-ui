@@ -1,20 +1,23 @@
 import {ISuccessCriterion} from "@/models/Skill";
 import {AxiosClient} from "@/api/AxiosClient";
+import {AxiosPromise} from "axios";
+import {IUserSuccessCriterion} from "@/models/UserSuccessCriteria";
+import {SkillsAPI} from "@/api/SkillsAPI";
 
 
 export abstract class SuccessCriterionAPI {
 
-    static async update(val: any): Promise<ISuccessCriterion> {
+    public static update(val: any): AxiosPromise<ISuccessCriterion> {
+        return AxiosClient.put<ISuccessCriterion>('/skills/sc/ '+ val.id, val);
+    }
 
-        let jsonValue = JSON.stringify(val);
-        const config = {
-            headers: {
-                accept: 'application/json',
-                'content-type': 'application/json',
-            },
-        };
-        let id = val.id;
-        let response = await AxiosClient.put('/skills/sc/ '+ id, jsonValue, config);
-        return response.data;
+    public static getAllSuccessCriterionByUserAndSkill(userId: number, skillId: number) : AxiosPromise<IUserSuccessCriterion[]> {
+        return AxiosClient.get<IUserSuccessCriterion[]>("/skills/users/" + userId + "/skills/" + skillId +
+            '/sc');
+    }
+
+    public static updateUserSuccessCriterion(userSuccessCriterion: IUserSuccessCriterion) : AxiosPromise<IUserSuccessCriterion> {
+        return AxiosClient.put<IUserSuccessCriterion>(SkillsAPI.prefix + "/users/" + userSuccessCriterion.userId +
+            '/sc/' + userSuccessCriterion.successCriterionId, userSuccessCriterion);
     }
 }

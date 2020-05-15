@@ -9,13 +9,12 @@ export interface IUser {
     position: IPosition;
     grade: string;
     role: string;
-    mentor: ISimpleUser;
+    mentor: ISimpleUser | null;
     lastPromotionDate: Date;
     futurePromotionDate: Date;
     inCompanySince: Date;
     followers: ISimpleUser[];
     followings: ISimpleUser[];
-    gradeProgress: number;
     active:boolean;
 }
 
@@ -34,7 +33,6 @@ export class User implements IUser {
     inCompanySince!: Date;
     followers!: ISimpleUser[];
     followings!: ISimpleUser[];
-    gradeProgress!: number;
     active!:boolean;
 }
 
@@ -43,7 +41,6 @@ export interface ISimpleUser {
     name: string;
     imageUrl: string;
     position: IPosition;
-    gradeProgress: number;
 }
 
 export class SimpleUser implements ISimpleUser {
@@ -51,7 +48,6 @@ export class SimpleUser implements ISimpleUser {
     name!: string;
     imageUrl!: string;
     position!: IPosition;
-    gradeProgress!: number;
 
     constructor(id: number, name: string, imageUrl: string, position: IPosition) {
         this.id = id;

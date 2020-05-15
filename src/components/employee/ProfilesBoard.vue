@@ -5,6 +5,7 @@
                 :items-per-page.sync="itemsPerPage"
                 :page="page"
                 :search="search"
+                :sort-by="sortBy"
                 hide-default-footer
         >
             <template v-slot:header>
@@ -143,7 +144,7 @@
 
         public itemsPerPage: number = 4;
 
-        public sortBy: string = 'name';
+        public sortBy: string = 'Name';
 
         public keys: string[] = [
             'Name',
