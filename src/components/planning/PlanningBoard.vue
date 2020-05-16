@@ -73,6 +73,35 @@
                             flat
                             style="width: 100%"
                     >
+                        <v-btn
+                                v-if="this.isNotCreatedPromotion && this.isModified"
+                                @click="createPromotion()"
+                                dark
+                                color="green"
+                                class="custom-card-border ma-2"
+                                elevation="0">
+                            CREATE
+                        </v-btn>
+
+                        <v-btn
+                                v-if="this.isCreatedPromotion"
+                                @click="cancelPromotion()"
+                                dark
+                                color="red"
+                                class="custom-card-border ma-2"
+                                elevation="0">
+                            CANCEL
+                        </v-btn>
+
+                        <v-btn
+                                v-if="this.isCreatedPromotion && this.isModified"
+                                @click="updatePromotion()"
+                                dark
+                                color="orange"
+                                class="custom-card-border ma-2"
+                                elevation="0">
+                            UPDATE
+                        </v-btn>
 
                         <v-card class="ma-4 custom-card-border" outlined>
 
@@ -89,14 +118,10 @@
                                 <div class="text-center">
                                     <div>
                                         <div>
-                                            <v-tooltip bottom>
-                                                <template v-slot:activator="{ on }">
-                                                    <v-avatar v-on="on" @click="goToUserProfile()" size="88">
-                                                        <v-img :src="selectedUser.imageUrl"/>
-                                                    </v-avatar>
-                                                </template>
-                                                <span>Go to user profile</span>
-                                            </v-tooltip>
+
+                                            <v-avatar size="88">
+                                                <v-img :src="selectedUser.imageUrl"/>
+                                            </v-avatar>
 
                                             <div @click="goToUserProfile()" class="headline mb-2">
                                                 <a class="link" @click="goToUserProfile()">
@@ -144,7 +169,6 @@
                                                         hide-selected
                                                         single-line
                                                         multiple
-                                                        v-on:change="inviteUsersToPromotion()"
                                                 >
                                                     <template v-slot:prepend>
                                                         <v-chip class="mb-5" :input-value="selectedUser">
@@ -195,31 +219,12 @@
                                 <PlanningCalendar :subordinate="this.selectedUser"
                                                   :promotion-start-date="this.promotion.startDate"
                                                   :promotion-end-date="this.promotion.endDate"
+                                                  :clear-calendar-data="this.clearCalendarData"
                                 />
 
                                 <!--    ACTIONS   -->
 
                                 <div class="ma-4 text-center">
-                                    <v-btn
-                                            v-if="this.isNotCreatedPromotion"
-                                            @click="createPromotion()"
-                                            dark
-                                            color="green"
-                                            class="custom-card-border ma-2"
-                                            elevation="0">
-                                        CREATE
-                                    </v-btn>
-
-                                    <v-btn
-                                            v-if="this.isCreatedPromotion"
-                                            @click="cancelPromotion()"
-                                            dark
-                                            color="green"
-                                            class="custom-card-border ma-2"
-                                            elevation="0">
-                                        CANCEL
-                                    </v-btn>
-
                                     <v-btn
                                             v-if="this.isCreatedPromotion"
                                             @click="approveGradeUp()"
@@ -263,9 +268,7 @@
                                         </v-list-item-title>
                                         <v-spacer/>
                                         <span class="caption">
-                                            {{promotion.originGradeId}}
-                                            ->
-                                            {{promotion.nextGradeId}}
+                                            {{promotion.originGradeId + '⟶' + promotion.nextGradeId}}
                                         </span>
                                         <v-spacer/>
                                         <span>
@@ -286,7 +289,7 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
+    import {Component, Vue, Watch, Ref} from 'vue-property-decorator';
     import {ISimpleUser, IUser, SimpleUser, User} from "@/models/User";
     import {UserAPI} from "@/api/UserAPI";
     import {SkillsAPI} from "@/api/SkillsAPI";
@@ -321,6 +324,17 @@
 
         public invitedUsers: IUser[] = [];
 
+        public isModified: boolean = false;
+
+        public clearCalendarData: boolean = false;
+
+        @Watch("invitedUsers")
+        public updateInvitedUsers(newVal : any, oldVal : any) {
+            if (oldVal && oldVal.length > 0 && newVal.length > 0) {
+                this.isModified = true;
+            }
+        }
+
         mounted() {
             this.fetchSubordinates();
 
@@ -329,6 +343,7 @@
             this.$bus.$on('promotionStartDate', (dateTime: string) => {
                 if (this.promotion) {
                     this.promotion.startDate = dateTime
+                    this.isModified = true;
                     debugger
                 }
             })
@@ -336,37 +351,53 @@
             this.$bus.$on('promotionEndDate', (dateTime: string) => {
                 if (this.promotion) {
                     this.promotion.endDate = dateTime
+                    this.isModified = true;
                     debugger
                 }
             })
         }
 
         public clearPromotionData() {
+            debugger
             this.promotion = new Promotion();
+            this.promotion.startDate = '';
+            this.promotion.endDate = '';
             this.invitedUsers = [];
             this.previousPromotions = [];
             this.promotion.status = 'NOT CREATED'
+            // this.clearCalendarData = true;
+            // this.clearCalendarData = false;
+            this.$emit('clearCalendarData', {});
         }
 
         public createPromotion() {
-            debugger
             if (this.selectedUser && this.promotion.startDate && this.promotion.endDate) {
                 this.promotion.members = this.invitedUsers.map(u => u.id);
                 this.promotion.userId = this.selectedUser.id;
                 this.promotion.nextGradeId = this.nextUserGrade.id;
                 this.promotion.originGradeId = this.getGradeByUserId(this.selectedUser.id).id;
                 this.promotion.status = 'CREATED';
-                debugger
                 PlanningAPI.createPromotion(this.promotion)
                     .then(r => {
                         this.promotion = r.data;
+                        this.isModified = false;
+                    })
+            }
+        }
+
+        public updatePromotion() {
+            debugger
+            if (this.selectedUser && this.promotion.startDate && this.promotion.endDate) {
+                PlanningAPI.createPromotion(this.promotion)
+                    .then(r => {
+                        this.promotion = r.data;
+                        this.isModified = false;
                     })
             }
         }
 
         public cancelPromotion() {
             if (this.promotion.id && this.promotion.status === 'CREATED') {
-                debugger
                 PlanningAPI.deletePromotionById(this.promotion.id);
                 this.clearPromotionData();
             }
@@ -426,22 +457,6 @@
             }
         }
 
-        public inviteUsersToPromotion() {
-
-            // let selectedUserIndex = this.invitedUsers.findIndex(u => u.id === this.selectedUser!.id);
-            // if (selectedUserIndex && selectedUserIndex === -1 && this.selectedUser) {
-            //     let u: IUser = new User();
-            //     u.id = this.selectedUser.id;
-            //     u.name = this.selectedUser.name
-            //     u.imageUrl = this.selectedUser.imageUrl
-            //     u.position = this.selectedUser.position
-            //     this.invitedUsers.push(u)
-            //     debugger
-            // }
-
-            //....
-        }
-
         public getEvents(date: Date) {
             // const [,, day] = date.split('-')
             // if ([12, 17, 28].includes(parseInt(day, 10))) return true
@@ -466,7 +481,6 @@
             this.originUserGrade = this.getGradeByUserId(subordinate.id);
             PlanningAPI.getAllPromotionsByUserId(subordinate.id)
                 .then(r => {
-                    debugger
                     let createdPromotion = r.data.filter(p => p.status === 'CREATED')[0];
                     if (createdPromotion) {
                         this.promotion = createdPromotion;
@@ -492,7 +506,6 @@
                         for (let i = 0, len = this.promotion.members.length; i < len; i++) {
                             let num = this.promotion.members[i];
                             let invitedUser = this.users.find(u => u.id === num);
-                            debugger
                             if (invitedUser) {
                                 this.invitedUsers = [];
                                 this.invitedUsers.push(invitedUser);

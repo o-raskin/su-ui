@@ -16,13 +16,13 @@
                             {{'Promotion date: '}}
                         </v-list-item-title>
                         <v-list-item-subtitle v-if="promotionEvent.start">
-                            {{'Starts: '}}{{promotionEvent.start }}
+                            {{'Starts: '}} {{promotionEvent.start  | formatDateTime}}
                         </v-list-item-subtitle>
                         <v-list-item-subtitle v-else>
                             {{'Not assigned'}}
                         </v-list-item-subtitle>
                         <v-list-item-subtitle v-if="promotionEvent.end">
-                            {{'Ends: '}}{{promotionEvent.end }}
+                            {{'Ends: '}} {{promotionEvent.end | formatDateTime }}
                         </v-list-item-subtitle>
                     </v-list-item-content>
                 </v-list-item>
@@ -78,7 +78,6 @@
                                 color="primary"
                                 :events="events"
                                 :event-color="getEventColor"
-                                !event-more
                                 :now="today"
                                 :type="type"
                                 @click:event="showEvent"
@@ -88,15 +87,7 @@
                                 @change="updateRange"
                                 :weekdays="weekdays"
                                 :locale="locale"
-                        >
-                            <template v-slot:interval="{ hour, minute}">
-                                <span
-                                        v-if="minute === new Date().getMinutes()"
-                                >
-                                    {{ hour + ':' + minute }} o'clock
-                                </span>
-                            </template>
-                        </v-calendar>
+                        ></v-calendar>
                         <v-menu
                                 v-model="selectedOpen"
                                 :close-on-content-click="false"
@@ -118,12 +109,12 @@
                                 <v-card-text>
                                     <span>
                                         <span class="text--primary">{{'Starts: '}}</span>
-                                        {{selectedEvent.start|formatDateTime}}
+                                        {{selectedEvent.start}}
                                     </span>
                                     <br/>
                                     <span>
                                         <span class="text--primary">{{'Ends: '}}</span>
-                                        {{selectedEvent.end|formatDateTime}}
+                                        {{selectedEvent.end}}
                                     </span>
                                     <br/>
                                     <span v-html="selectedEvent.details"></span>
@@ -240,6 +231,7 @@
 <script>
     import {Component, Vue} from 'vue-property-decorator';
     import {IUser} from "@/models/User";
+    import { bus } from '@/main';
 
     export default {
         name: "PlanningCalendar",
@@ -254,6 +246,35 @@
             promotionEndDate: {
                 type: String
             },
+            clearCalendarData: {
+                type: Object
+            }
+        },
+        watch: {
+            clearCalendarData: function (newVal, oldVal) {
+                debugger
+                if (newVal) {
+                    debugger
+                    this.start = null
+                    this.end = null
+                    this.startTime = null
+                    this.endTime = null
+                    this.dialog = false
+                    this.timepickerDialog1 = false
+                    this.timepickerDialog2 = false
+                    this.modal1 = false
+                    this.modal2 = false
+                    this.promotionEvent.end = null
+                    this.promotionEvent.start = null
+                    this.promotionEvent.name = null
+                    let pIndex = this.events.findIndex(e => e.id === 'PROMOTION_ID')
+                    if (pIndex !== -1) {
+                        this.events.slice(pIndex, 1);
+                    }
+                    this.promotionEventOpen = false
+                    debugger
+                }
+            }
         },
         data() {
             return {
@@ -334,8 +355,28 @@
         },
         mounted() {
             this.$refs.calendar.checkChange()
-
             this.initEventFromData()
+
+            this.$on('clearCalendarData', (val) => {
+                debugger
+                this.start = null
+                this.end = null
+                this.startTime = null
+                this.endTime = null
+                this.dialog = false
+                this.timepickerDialog1 = false
+                this.timepickerDialog2 = false
+                this.modal1 = false
+                this.modal2 = false
+                this.promotionEvent.end = null
+                this.promotionEvent.start = null
+                this.promotionEvent.name = null
+                let pIndex = this.events.findIndex(e => e.id === 'PROMOTION_ID')
+                if (pIndex !== -1) {
+                    this.events.slice(pIndex, 1);
+                }
+                this.promotionEventOpen = false
+            })
         },
         watch: {
             promotionEventOpen: function (val) {
@@ -343,22 +384,48 @@
                     this.selectedOpen = false;
                 }
             },
+            promotionStartDate: {
+                immediate: true,
+                handler (val, oldVal) {
+                    this.initEventFromData()
+                }
+            },
         },
         methods: {
-            initEventFromData() {
+            clearData() {
                 debugger
+                this.start = null
+                this.end = null
+                this.startTime = null
+                this.endTime = null
+                this.dialog = false
+                this.timepickerDialog1 = false
+                this.timepickerDialog2 = false
+                this.modal1 = false
+                this.modal2 = false
+                this.promotionEvent.end = null
+                this.promotionEvent.start = null
+                this.promotionEvent.name = null
+                let pIndex = this.events.findIndex(e => e.id === 'PROMOTION_ID')
+                if (pIndex !== -1) {
+                    this.events.slice(pIndex, 1);
+                }
+                this.promotionEventOpen = false
+            },
+            initEventFromData() {
                 if (this.promotionStartDate && this.promotionEndDate) {
                     //  use this method only for init promotion event
                     let e = {
                         id: 'PROMOTION_ID',
                         name: this.subordinate.name + '\'s promotion',
-                        start: this.formatDate(this.promotionStartDate, -1),
-                        end: this.formatDate(this.promotionEndDate, -1),
+                        start: this.formatDate(new Date(this.promotionStartDate), -1),
+                        end: this.formatDate(new Date(this.promotionEndDate), -1),
                         color: this.colors[this.rnd(0, this.colors.length - 1)],
                     }
-
+                    this.promotionEvent = e;
                     this.startTime = new Date(this.promotionStartDate).getHours() + ':' + new Date(this.promotionStartDate).getMinutes()
                     this.endTime = new Date(this.promotionEndDate).getHours() + ':' + new Date(this.promotionEndDate).getMinutes()
+                    this.events.pop();
                     this.events.push(e)
                 }
             },
@@ -387,7 +454,6 @@
                 debugger
             },
             addEvent(eventTime) {
-                this.$forceUpdate()
                 let eventDateTime = new Date(eventTime.date + ' ' + eventTime.time)
                 let currentDateTime = new Date()
                 if (eventDateTime < currentDateTime) {
@@ -422,16 +488,6 @@
                 this.startTime = null
                 this.endTime = null
             },
-            // showError() {
-            //     const openError = () => {
-            //         setTimeout(() => this.errorOpen = true, 10)
-            //     }
-            //     openError()
-            //     if (this.errorOpen) {
-            //         this.errorOpen = false
-            //         setTimeout(openError, 10)
-            //     }
-            // },
             showEvent({nativeEvent, event}) {
                 debugger
                 this.selectedEvent = event

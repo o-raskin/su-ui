@@ -13,8 +13,7 @@ Vue.config.productionTip = false
  *    EVENTS
  */
 Vue.use(EventBus);
-var bus = new EventBus.Bus();
-
+export const bus = new EventBus.Bus();
 /**
  *    DATE FORMATTER
  */
@@ -26,7 +25,8 @@ Vue.filter('formatDate', function (value: any) {
 });
 Vue.filter('formatDateTime', function (value: any) {
     if (value) {
-        let d = moment(String(value)).format('HH:MM DD.MM.YYYY');
+        let d = moment(String(value)).format('hh:mm DD.MM.YYYY');
+        debugger
         if (!d || d === 'Invalid date') {
             d = moment(String(value), 'YYYY-MM-DD').format('DD.MM.YYYY');
         }
