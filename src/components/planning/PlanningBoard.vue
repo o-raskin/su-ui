@@ -73,35 +73,37 @@
                             flat
                             style="width: 100%"
                     >
-                        <v-btn
-                                v-if="this.isNotCreatedPromotion && this.isModified"
-                                @click="createPromotion()"
-                                dark
-                                color="green"
-                                class="custom-card-border ma-2"
-                                elevation="0">
-                            CREATE
-                        </v-btn>
+                        <div class="text-center">
+                            <v-btn
+                                    v-if="this.isNotCreatedPromotion"
+                                    @click="createPromotion()"
+                                    dark
+                                    color="green"
+                                    class="custom-card-border ma-2"
+                                    elevation="0">
+                                CREATE
+                            </v-btn>
 
-                        <v-btn
-                                v-if="this.isCreatedPromotion"
-                                @click="cancelPromotion()"
-                                dark
-                                color="red"
-                                class="custom-card-border ma-2"
-                                elevation="0">
-                            CANCEL
-                        </v-btn>
+                            <v-btn
+                                    v-if="this.isCreatedPromotion"
+                                    @click="cancelPromotion()"
+                                    dark
+                                    color="red"
+                                    class="custom-card-border ma-2"
+                                    elevation="0">
+                                CANCEL
+                            </v-btn>
 
-                        <v-btn
-                                v-if="this.isCreatedPromotion && this.isModified"
-                                @click="updatePromotion()"
-                                dark
-                                color="orange"
-                                class="custom-card-border ma-2"
-                                elevation="0">
-                            UPDATE
-                        </v-btn>
+                            <v-btn
+                                    v-if="this.isCreatedPromotion && this.isModified"
+                                    @click="updatePromotion()"
+                                    dark
+                                    color="orange"
+                                    class="custom-card-border ma-2"
+                                    elevation="0">
+                                UPDATE
+                            </v-btn>
+                        </div>
 
                         <v-card class="ma-4 custom-card-border" outlined>
 
@@ -146,7 +148,8 @@
                                                 {{'Invited: '}}
                                             </v-list-item-title>
                                             <v-list-item-subtitle>
-                                                {{(promotion.members && promotion.members.length > 0 ? invitedUsers.map(u => u.name) : 'None').toString()}}
+                                                {{(promotion.members && promotion.members.length > 0 ?
+                                                invitedUsers.map(u => u.name) : 'None').toString()}}
                                             </v-list-item-subtitle>
                                         </v-list-item-content>
                                     </template>
@@ -169,6 +172,7 @@
                                                         hide-selected
                                                         single-line
                                                         multiple
+                                                        @change="updateInvitedUsers"
                                                 >
                                                     <template v-slot:prepend>
                                                         <v-chip class="mb-5" :input-value="selectedUser">
@@ -194,11 +198,10 @@
                                                                     v-text="data.item"></v-list-item-content>
                                                         </template>
                                                         <template v-else>
-                                                            <v-list-item-avatar
-                                                                    v-if="data.item.imageUrl">
-                                                                <img :src="data.item.imageUrl">
-                                                            </v-list-item-avatar>
-                                                            <v-list-item-content>
+                                                            <v-avatar size="40px" v-if="data.item.imageUrl">
+                                                                <v-img :src="data.item.imageUrl"/>
+                                                            </v-avatar>
+                                                            <v-list-item-content class="ml-2">
                                                                 <v-list-item-title
                                                                         v-html="data.item.name"></v-list-item-title>
                                                                 <v-list-item-subtitle
@@ -217,25 +220,52 @@
                                 <!-- Promotion date -->
 
                                 <PlanningCalendar :subordinate="this.selectedUser"
-                                                  :promotion-start-date="this.promotion.startDate"
-                                                  :promotion-end-date="this.promotion.endDate"
-                                                  :clear-calendar-data="this.clearCalendarData"
+                                                  :promotion="this.promotion"
                                 />
+                                <!--                                                  :promotion-end-date="this.promotion.endDate"-->
 
                                 <!--    ACTIONS   -->
 
                                 <div class="ma-4 text-center">
-                                    <v-btn
-                                            v-if="this.isCreatedPromotion"
-                                            @click="approveGradeUp()"
-                                            dark
-                                            color="green"
-                                            class="custom-card-border ma-2"
-                                            elevation="0">
-                                        SUCCESS
-                                    </v-btn>
+                                    <v-row justify="center">
+                                        <v-dialog v-model="approveModal" persistent max-width="290">
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn
+                                                        outlined
+                                                        v-if="this.isCreatedPromotion"
+                                                        @click="successGradeUp()"
+                                                        dark
+                                                        color="green"
+                                                        class="custom-card-border ma-2"
+                                                        elevation="0">
+                                                    SUCCESS
+                                                </v-btn>
+                                            </template>
+                                            <v-card>
+                                                <v-card-title class="headline">Approve promotion to next grade?</v-card-title>
+                                                <v-card-text>You cannot reverse that decision.</v-card-text>
+                                                <v-card-actions>
+                                                    <v-spacer></v-spacer>
+                                                    <v-btn color="green darken-1" text @click="approveModal = false">Disagree</v-btn>
+                                                    <v-btn color="green darken-1" text @click="approveModal = false">Agree</v-btn>
+                                                </v-card-actions>
+                                            </v-card>
+                                        </v-dialog>
+                                    </v-row>
+
+<!--                                    <v-btn-->
+<!--                                            outlined-->
+<!--                                            v-if="this.isCreatedPromotion"-->
+<!--                                            @click="successGradeUp()"-->
+<!--                                            dark-->
+<!--                                            color="green"-->
+<!--                                            class="custom-card-border ma-2"-->
+<!--                                            elevation="0">-->
+<!--                                        SUCCESS-->
+<!--                                    </v-btn>-->
 
                                     <v-btn
+                                            outlined
                                             v-if="this.isCreatedPromotion"
                                             @click="failGradeUp()"
                                             dark
@@ -258,27 +288,27 @@
 
                             <v-content class="widget-content-height pa-5 overflow-y-auto">
 
-                                <div v-for="(promotion, i) in this.previousPromotions"
+                                <div v-for="(prevPromotion, i) in this.previousPromotions"
                                      :key="i">
 
                                     <v-divider v-if="i !== 0"></v-divider>
-                                    <v-list-item dense>
-                                        <v-list-item-title>
-                                            {{promotion.startDate | formatDate}}
-                                        </v-list-item-title>
-                                        <v-spacer/>
-                                        <span class="caption">
-                                            {{promotion.originGradeId + '⟶' + promotion.nextGradeId}}
+                                    <v-list-item>
+                                        <span class="body-2">
+                                            {{prevPromotion.startDate | formatDate}}
+                                        </span>
+                                        <span class="body-2 ml-12">
+                                            {{getGradeByGradeId(prevPromotion.nextGradeId).name}}
                                         </span>
                                         <v-spacer/>
-                                        <span>
-                                            {{promotion.status}}
-                                        </span>
+                                        <v-chip small label class="font-weight-bold">
+                                            {{prevPromotion.status}}
+                                        </v-chip>
                                     </v-list-item>
 
                                 </div>
                             </v-content>
                         </v-card>
+
                     </v-card>
 
 
@@ -299,7 +329,9 @@
     import {SkillsGradeAPI} from "@/api/SkillsGradeAPI";
     import {IPromotion, Promotion} from "@/models/Promotion";
     import PlanningCalendar from "@/components/planning/PlanningCalendar.vue";
-    import {PlanningAPI} from "@/api/PlanningAPI";
+    import {PromotionAPI} from "@/api/PromotionAPI";
+    import {IEvent} from "@/models/Event";
+    import {UserEventsAPI} from "@/api/UserEventsAPI";
 
     @Component({
         components: {
@@ -310,6 +342,8 @@
 
         @State((state) => state.currentUser)
         public readonly currentUser!: IUser;
+
+        public approveModal: boolean = false;
 
         public subordinates: ISimpleUser[] = [];
         public subordinatesSkillsData: ISkillsUser[] = [];
@@ -325,49 +359,82 @@
         public invitedUsers: IUser[] = [];
 
         public isModified: boolean = false;
+        public isDatesUpdated: boolean = false;
 
-        public clearCalendarData: boolean = false;
+        public grades: IGrade[] = [];
 
-        @Watch("invitedUsers")
-        public updateInvitedUsers(newVal : any, oldVal : any) {
-            if (oldVal && oldVal.length > 0 && newVal.length > 0) {
-                this.isModified = true;
+        public events: IEvent[] = [];
+
+        @Watch("selectedUser")
+        public watchSelectedUser(newVal: any, oldVal: any) {
+            if (newVal && oldVal && newVal.id !== oldVal.id) {
+                this.clearAllPromotionData();
+                this.fetchSubordinates();
+                this.fetchAllGrades();
+                this.promotion.status = 'NOT CREATED';
+            }
+        }
+
+        public selectUser(subordinate: ISimpleUser) {
+            if (this.selectedUser && this.selectedUser.id === subordinate.id) {
+                this.selectedUser = null;
+                this.clearAllPromotionData();
+            } else {
+                this.selectedUser = subordinate
+                this.fetchUserData(this.selectedUser);
             }
         }
 
         mounted() {
             this.fetchSubordinates();
-
+            this.fetchAllGrades();
             this.promotion.status = 'NOT CREATED';
 
             this.$bus.$on('promotionStartDate', (dateTime: string) => {
-                if (this.promotion) {
+                if (this.promotion && (this.promotion.startDate !== dateTime)) {
                     this.promotion.startDate = dateTime
                     this.isModified = true;
-                    debugger
+                    this.isDatesUpdated = true;
                 }
             })
 
             this.$bus.$on('promotionEndDate', (dateTime: string) => {
-                if (this.promotion) {
+                if (this.promotion && this.promotion.endDate !== dateTime) {
                     this.promotion.endDate = dateTime
                     this.isModified = true;
-                    debugger
+                    this.isDatesUpdated = true;
                 }
             })
         }
 
-        public clearPromotionData() {
-            debugger
+        // PROMOTION ACTIONS
+
+        public successGradeUp() {
+            if (this.promotion) {
+                PromotionAPI.setPromotionStatus(this.promotion.id, 'SUCCESS');
+                this.promotion.status = 'SUCCESS';
+                this.previousPromotions.unshift(this.promotion);
+                this.clearAllPromotionData();
+            }
+        }
+
+        public failGradeUp() {
+            if (this.promotion) {
+                PromotionAPI.setPromotionStatus(this.promotion.id, 'FAILED')
+                this.promotion.status = 'FAILED'
+                this.previousPromotions.unshift(this.promotion);
+                this.clearAllPromotionData();
+            }
+        }
+
+        public clearAllPromotionData() {
             this.promotion = new Promotion();
             this.promotion.startDate = '';
             this.promotion.endDate = '';
             this.invitedUsers = [];
-            this.previousPromotions = [];
-            this.promotion.status = 'NOT CREATED'
-            // this.clearCalendarData = true;
-            // this.clearCalendarData = false;
-            this.$emit('clearCalendarData', {});
+            this.promotion.status = 'NOT CREATED';
+            this.isModified = false;
+            this.isDatesUpdated = false;
         }
 
         public createPromotion() {
@@ -377,7 +444,7 @@
                 this.promotion.nextGradeId = this.nextUserGrade.id;
                 this.promotion.originGradeId = this.getGradeByUserId(this.selectedUser.id).id;
                 this.promotion.status = 'CREATED';
-                PlanningAPI.createPromotion(this.promotion)
+                PromotionAPI.createPromotion(this.promotion)
                     .then(r => {
                         this.promotion = r.data;
                         this.isModified = false;
@@ -386,9 +453,8 @@
         }
 
         public updatePromotion() {
-            debugger
             if (this.selectedUser && this.promotion.startDate && this.promotion.endDate) {
-                PlanningAPI.createPromotion(this.promotion)
+                PromotionAPI.createPromotion(this.promotion)
                     .then(r => {
                         this.promotion = r.data;
                         this.isModified = false;
@@ -398,8 +464,8 @@
 
         public cancelPromotion() {
             if (this.promotion.id && this.promotion.status === 'CREATED') {
-                PlanningAPI.deletePromotionById(this.promotion.id);
-                this.clearPromotionData();
+                PromotionAPI.deletePromotionById(this.promotion.id);
+                this.clearAllPromotionData();
             }
         }
 
@@ -436,12 +502,14 @@
             return grade;
         }
 
-        public selectUser(subordinate: ISimpleUser) {
-            if (this.selectedUser === subordinate) {
-                this.selectedUser = null;
+        public getGradeByGradeId(gradeId: number): IGrade {
+            let grade = this.grades.find(g => g.id === gradeId)
+            if (grade) {
+                return grade;
             } else {
-                this.selectedUser = subordinate
-                this.fetchUserData(this.selectedUser);
+                grade = new Grade();
+                grade.name = 'N/A';
+                return grade;
             }
         }
 
@@ -457,11 +525,16 @@
             }
         }
 
-        public getEvents(date: Date) {
-            // const [,, day] = date.split('-')
-            // if ([12, 17, 28].includes(parseInt(day, 10))) return true
-            // if ([1, 19, 22].includes(parseInt(day, 10))) return ['red', '#00f']
-            return false
+        public fetchMemberPromotions(user : IUser|undefined) {
+            if (user && user.id) {
+                UserEventsAPI.getUserEvents(user.id)
+                    .then(response => {
+                        debugger
+                        for (let currentUserEvent in response.data) {
+
+                        }
+                    })
+            }
         }
 
         public eventHighL(): string {
@@ -472,26 +545,33 @@
          * Fetching selected user data
          */
         public fetchUserData(subordinate: ISimpleUser) {
-            let currentGrade: IGrade = this.getGradeByUserId(subordinate.id);
-            this.promotion.originGradeId = currentGrade.id;
-
-            this.fetchNextGradeById(currentGrade.nextGradeId);
-            this.fetchUsersForInvite();
 
             this.originUserGrade = this.getGradeByUserId(subordinate.id);
-            PlanningAPI.getAllPromotionsByUserId(subordinate.id)
+            this.promotion.originGradeId = this.originUserGrade.id;
+
+            this.nextUserGrade = this.getGradeByGradeId(this.originUserGrade.nextGradeId);
+            this.promotion.nextGradeId = this.nextUserGrade.id;
+
+            PromotionAPI.getAllPromotionsByUserId(subordinate.id)
                 .then(r => {
                     let createdPromotion = r.data.filter(p => p.status === 'CREATED')[0];
                     if (createdPromotion) {
                         this.promotion = createdPromotion;
                     }
                     this.previousPromotions = r.data.filter(p => p.status === 'FAILED' || p.status === 'SUCCESS')
+                    this.previousPromotions.sort((p1,p2) => {
+                        return -(new Date(p1.startDate).getTime() - new Date(p2.startDate).getTime())
+                    })
+
+                    this.fetchUsersForInvite();
                 })
         }
 
-        public fetchNextGradeById(gradeId: number) {
-            SkillsGradeAPI.getGradeById(gradeId)
-                .then(r => this.nextUserGrade = r.data);
+        public fetchAllGrades() {
+            SkillsGradeAPI.getAll()
+                .then(r => {
+                    this.grades = r.data
+                });
         }
 
         public fetchUsersForInvite() {
@@ -501,29 +581,27 @@
                         .filter(u => u.name !== 'SYSTEM' || u.email !== 'system@skillup.com')
                         .filter(u => u.id !== this.selectedUser!.id)
 
+                    // set entries into invited users array
                     if (this.promotion.members && this.promotion.members.length > 0) {
-                        // set entries into invited users
+                        this.invitedUsers = [];
                         for (let i = 0, len = this.promotion.members.length; i < len; i++) {
                             let num = this.promotion.members[i];
                             let invitedUser = this.users.find(u => u.id === num);
                             if (invitedUser) {
-                                this.invitedUsers = [];
                                 this.invitedUsers.push(invitedUser);
                             }
+
+                            this.fetchMemberPromotions(invitedUser);
                         }
                     }
                 });
         }
 
-        public fetchCurrentUserEvents() {
-            // for using 'Date events'
-
-        }
 
         //  CHECK PROMOTION STATUS
 
         get isNotCreatedPromotion(): boolean {
-            return this.promotion.status === 'NOT CREATED'
+            return this.isDatesUpdated && this.promotion.status === 'NOT CREATED';
         }
 
         get isCreatedPromotion(): boolean {
@@ -536,6 +614,12 @@
 
         get isFailedPromotion(): boolean {
             return this.promotion.status === 'FAILED'
+        }
+
+        // CHECK INVITED USERS CHANGES
+        public updateInvitedUsers() {
+            this.isModified = true;
+            this.promotion.members = this.invitedUsers.map(u => u.id)
         }
 
     }

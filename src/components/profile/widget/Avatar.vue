@@ -57,14 +57,14 @@
             </v-tooltip>
 
 
-            <v-list-item
-                    link
-                    v-if="isNotYourProfile"
-            >
-                <v-list-item-title class="text-uppercase text-center">
-                    {{btn_send_message_text}}
-                </v-list-item-title>
-            </v-list-item>
+<!--            <v-list-item-->
+<!--                    link-->
+<!--                    v-if="isNotYourProfile"-->
+<!--            >-->
+<!--                <v-list-item-title class="text-uppercase text-center">-->
+<!--                    {{btn_send_message_text}}-->
+<!--                </v-list-item-title>-->
+<!--            </v-list-item>-->
 
             <v-list-item
                     @click="follow()"
@@ -200,7 +200,7 @@
 
         data() {
             return {
-                btn_send_message_text: 'Chat',
+                // btn_send_message_text: 'Chat',
                 btn_follow_text: 'Follow',
                 btn_unfollow_text: 'Unfollow',
                 btn_approve_grade_text: 'Approve grade',

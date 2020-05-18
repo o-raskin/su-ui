@@ -16,7 +16,7 @@
                             {{'Promotion date: '}}
                         </v-list-item-title>
                         <v-list-item-subtitle v-if="promotionEvent.start">
-                            {{'Starts: '}} {{promotionEvent.start  | formatDateTime}}
+                            {{'Starts: '}} {{promotionEvent.start | formatDateTime}}
                         </v-list-item-subtitle>
                         <v-list-item-subtitle v-else>
                             {{'Not assigned'}}
@@ -228,364 +228,336 @@
     </div>
 </template>
 
-<script>
-    import {Component, Vue} from 'vue-property-decorator';
-    import {IUser} from "@/models/User";
-    import { bus } from '@/main';
+<script lang="ts">
+    import {Component, Vue, Watch, Prop} from 'vue-property-decorator';
+    import {IUser, User} from "@/models/User";
+    import {VCalendar} from "vuetify/lib";
+    import {IPromotion, Promotion} from "@/models/Promotion";
+    import {IEvent} from "@/models/Event";
 
-    export default {
-        name: "PlanningCalendar",
+    @Component({
         components: {},
-        props: {
-            subordinate: {
-                type: Object
-            },
-            promotionStartDate: {
-                type: String
-            },
-            promotionEndDate: {
-                type: String
-            },
-            clearCalendarData: {
-                type: Object
+    })
+    export default class PlanningCalendar extends Vue {
+
+        $refs!: {
+            // @ts-ignore
+            calendar: VCalendar
+        }
+
+        @Prop()
+        public subordinate!: IUser;
+
+        @Prop()
+        public promotion!: IPromotion
+
+        @Watch("promotion")
+        public watchPromotionStartDate(newVal: IPromotion, oldVal: any) {
+            if (newVal.id) {
+                this.initEventFromData()
             }
-        },
-        watch: {
-            clearCalendarData: function (newVal, oldVal) {
-                debugger
-                if (newVal) {
-                    debugger
-                    this.start = null
-                    this.end = null
-                    this.startTime = null
-                    this.endTime = null
-                    this.dialog = false
-                    this.timepickerDialog1 = false
-                    this.timepickerDialog2 = false
-                    this.modal1 = false
-                    this.modal2 = false
-                    this.promotionEvent.end = null
-                    this.promotionEvent.start = null
-                    this.promotionEvent.name = null
-                    let pIndex = this.events.findIndex(e => e.id === 'PROMOTION_ID')
-                    if (pIndex !== -1) {
-                        this.events.slice(pIndex, 1);
-                    }
-                    this.promotionEventOpen = false
-                    debugger
-                }
+            if (newVal.status === 'NOT CREATED') {
+                this.clearData()
             }
-        },
+        }
+
+        @Watch("promotionEventOpen")
+        public watchPromotionEventOpen(val: any, old: any) {
+            if (val) {
+                this.selectedOpen = false;
+            }
+        }
+
+        @Prop()
+        public eventsData!: IEvent[];
+
+        @Watch("eventsData")
+        public watchReceivedEventsData(val: IEvent[], old: any) {
+            if (val && val.length > 0) {
+                // this.events = val.map(data => this.generateEvent(data));
+            }
+        }
+
+
+        public promotionEventOpen: boolean = false;
+        public start: any = null;
+        public end: any = null;
+        public selectedElement: any = null;
+        public events: any[] = [];
+        public locale: string = 'en-UK';
+        public promotionEvent: any = {};
+        public selectedEvent: any = {};
+        public selectedOpen: boolean = false;
+        public startTime: any = null;
+        public endTime: any = null;
+        public dialog: boolean = false;
+        public timepickerDialog1: boolean = false;
+        public timepickerDialog2: boolean = false;
+        public modal1: boolean = false;
+        public modal2: boolean = false;
+        public colors: any[] = ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'];
+        public focus: any = '';
+        public type: string = 'month';
+        public today: any = new Date().toISOString().slice(0, 10);
+
         data() {
             return {
-                locale: 'en-UK',
                 weekdays: [1, 2, 3, 4, 5, 6, 0],
-                focus: '',
-                type: 'month',
                 typeToLabel: {
                     month: 'Month',
                     week: 'Week',
                     day: 'Day',
                 },
-                start: null,
-                end: null,
-                selectedEvent: {},
-                selectedElement: null,
-                selectedOpen: false,
-                events: [],
-                colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
                 names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
-
-                // promotion modal
-                promotionEvent: {},
-                promotionEventOpen: false,
-
-                //  promotion time
                 start_time_text: 'Starts: ',
                 end_time_text: 'Ends: ',
-
-                startTime: null,
-                endTime: null,
-
-                dialog: false,
-                timepickerDialog1: false,
-                timepickerDialog2: false,
-                modal1: false,
-                modal2: false,
             }
-        },
-        computed: {
-            currentTime() {
-                let a = new Date();
-                return a.getHours() + ':' + a.getMinutes();
-            },
-            title() {
-                const {start, end} = this
-                if (!start || !end) {
-                    return ''
-                }
+        }
 
-                const startMonth = this.monthFormatter(start)
-                const endMonth = this.monthFormatter(end)
-                const suffixMonth = startMonth === endMonth ? '' : endMonth
+        get currentTime() {
+            let a = new Date();
+            return a.getHours() + ':' + a.getMinutes();
+        }
 
-                const startYear = start.year
-                const endYear = end.year
-                const suffixYear = startYear === endYear ? '' : endYear
-
-                const startDay = start.day + this.nth(start.day)
-                const endDay = end.day + this.nth(end.day)
-
-                switch (this.type) {
-                    case 'month':
-                        return `${startMonth} ${startYear}`
-                    case 'week':
-                    case '4day':
-                        return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
-                    case 'day':
-                        return `${startMonth} ${startDay} ${startYear}`
-                }
+        get title() {
+            const {start, end} = this
+            if (!start || !end) {
                 return ''
-            },
-            monthFormatter() {
-                return this.$refs.calendar.getFormatter({
-                    timeZone: 'UTC', month: 'long',
-                })
-            },
-        },
-        mounted() {
-            this.$refs.calendar.checkChange()
-            this.initEventFromData()
+            }
 
-            this.$on('clearCalendarData', (val) => {
-                debugger
-                this.start = null
-                this.end = null
-                this.startTime = null
-                this.endTime = null
-                this.dialog = false
-                this.timepickerDialog1 = false
-                this.timepickerDialog2 = false
-                this.modal1 = false
-                this.modal2 = false
-                this.promotionEvent.end = null
-                this.promotionEvent.start = null
-                this.promotionEvent.name = null
-                let pIndex = this.events.findIndex(e => e.id === 'PROMOTION_ID')
-                if (pIndex !== -1) {
-                    this.events.slice(pIndex, 1);
-                }
-                this.promotionEventOpen = false
+            const startMonth = this.monthFormatter(start)
+            const endMonth = this.monthFormatter(end)
+            const suffixMonth = startMonth === endMonth ? '' : endMonth
+
+            const startYear = start.year
+            const endYear = end.year
+            const suffixYear = startYear === endYear ? '' : endYear
+
+            const startDay = start.day + this.nth(start.day)
+            const endDay = end.day + this.nth(end.day)
+
+            switch (this.type) {
+                case 'month':
+                    return `${startMonth} ${startYear}`
+                case 'week':
+                case '4day':
+                    return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
+                case 'day':
+                    return `${startMonth} ${startDay} ${startYear}`
+            }
+            return ''
+        }
+
+        get monthFormatter() {
+            return this.$refs.calendar.getFormatter({
+                timeZone: 'UTC', month: 'long',
             })
-        },
-        watch: {
-            promotionEventOpen: function (val) {
-                if (val) {
-                    this.selectedOpen = false;
-                }
-            },
-            promotionStartDate: {
-                immediate: true,
-                handler (val, oldVal) {
-                    this.initEventFromData()
-                }
-            },
-        },
-        methods: {
-            clearData() {
-                debugger
-                this.start = null
-                this.end = null
-                this.startTime = null
-                this.endTime = null
-                this.dialog = false
-                this.timepickerDialog1 = false
-                this.timepickerDialog2 = false
-                this.modal1 = false
-                this.modal2 = false
-                this.promotionEvent.end = null
-                this.promotionEvent.start = null
-                this.promotionEvent.name = null
-                let pIndex = this.events.findIndex(e => e.id === 'PROMOTION_ID')
-                if (pIndex !== -1) {
-                    this.events.slice(pIndex, 1);
-                }
-                this.promotionEventOpen = false
-            },
-            initEventFromData() {
-                if (this.promotionStartDate && this.promotionEndDate) {
-                    //  use this method only for init promotion event
-                    let e = {
-                        id: 'PROMOTION_ID',
-                        name: this.subordinate.name + '\'s promotion',
-                        start: this.formatDate(new Date(this.promotionStartDate), -1),
-                        end: this.formatDate(new Date(this.promotionEndDate), -1),
-                        color: this.colors[this.rnd(0, this.colors.length - 1)],
-                    }
-                    this.promotionEvent = e;
-                    this.startTime = new Date(this.promotionStartDate).getHours() + ':' + new Date(this.promotionStartDate).getMinutes()
-                    this.endTime = new Date(this.promotionEndDate).getHours() + ':' + new Date(this.promotionEndDate).getMinutes()
-                    this.events.pop();
-                    this.events.push(e)
-                }
-            },
-            savePromotionStartTime() {
-                this.modal1 = false;
-                this.promotionEvent.start = this.start.date + ' ' + this.startTime
-                if (new Date(this.promotionEvent.start) > new Date(this.promotionEvent.end)) {
-                    this.promotionEvent.start = this.promotionEvent.end
-                    this.startTime = new Date(this.promotionEvent.end).getHours() + ':' + new Date(this.promotionEvent.end).getMinutes()
-                    debugger
-                } else if (new Date(this.promotionEvent.start) < new Date()) {
-                    debugger
-                    this.promotionEvent.start = new Date().toISOString().slice(0, 10)
-                }
-                this.$bus.$emit('promotionStartDate', this.promotionEvent.start)
-                debugger
-            },
-            savePromotionEndTime() {
-                this.modal2 = false;
-                this.promotionEvent.end = this.start.date + ' ' + this.endTime
-                if (new Date(this.promotionEvent.end) < new Date(this.promotionEvent.start)) {
-                    this.promotionEvent.end = this.promotionEvent.start
-                    this.endTime = new Date(this.promotionEvent.start).getHours() + ':' + new Date(this.promotionEvent.start).getMinutes()
-                }
-                this.$bus.$emit('promotionEndDate', this.promotionEvent.end)
-                debugger
-            },
-            addEvent(eventTime) {
-                let eventDateTime = new Date(eventTime.date + ' ' + eventTime.time)
-                let currentDateTime = new Date()
-                if (eventDateTime < currentDateTime) {
-                    this.$bus.$emit('status', {text: 'Cannot not set event in past', color: 'error'})
-                    return
-                }
+        }
 
-                //  removing old if it exists
-                if (this.promotionEvent.id === 'PROMOTION_ID') {
-                    this.deletePromotionEvent()
-                }
+        mounted() {
+            // this.$refs.calendar.checkChange()
+            this.initEventFromData()
+        }
 
+        public clearData() {
+            this.start = null
+            this.end = null
+            this.startTime = null
+            this.endTime = null
+            this.dialog = false
+            this.timepickerDialog1 = false
+            this.timepickerDialog2 = false
+            this.modal1 = false
+            this.modal2 = false
+            this.promotionEvent.end = null
+            this.promotionEvent.start = null
+            this.promotionEvent.name = null
+            let pIndex = this.events.findIndex(e => e.id === 'PROMOTION_ID')
+            if(pIndex !== -1) {
+                this.events.slice(pIndex, 1);
+            }
+            this.promotionEventOpen = false
+        }
+
+        public initEventFromData() {
+            if (this.promotion && this.promotion.startDate && this.promotion.endDate) {
+                //  use this method only for init promotion event
                 let e = {
                     id: 'PROMOTION_ID',
                     name: this.subordinate.name + '\'s promotion',
-                    start: this.formatDate(new Date(eventTime.date + ' ' + eventTime.time), -1),
-                    end: this.formatDate(new Date(eventTime.date + ' ' + eventTime.time), -1),
+                    start: this.formatDate(new Date(this.promotion.startDate), -1),
+                    end: this.formatDate(new Date(this.promotion.endDate), -1),
                     color: this.colors[this.rnd(0, this.colors.length - 1)],
                 }
-
-                this.events.push(e)
                 this.promotionEvent = e;
-                this.startTime = eventTime.time
-                this.endTime = eventTime.time
-                this.$bus.$emit('promotionStartDate', eventTime.date + ' ' + eventTime.time)
-                this.$bus.$emit('promotionEndDate', eventTime.date + ' ' + eventTime.time)
-            },
-            deletePromotionEvent() {
-                this.events.pop()
-                this.promotionEvent = {}
-                this.promotionEventOpen = false
-                this.startTime = null
-                this.endTime = null
-            },
-            showEvent({nativeEvent, event}) {
-                debugger
-                this.selectedEvent = event
-                this.selectedElement = nativeEvent.target
-
-                if (event.id && event.id === 'PROMOTION_ID') {
-                    const openPromotionMenu = () => {
-                        setTimeout(() => this.promotionEventOpen = true, 10)
-                    }
-
-                    openPromotionMenu()
-                    if (this.promotionEventOpen) {
-                        this.promotionEventOpen = false
-                        setTimeout(openPromotionMenu, 10)
-                    }
-                } else {
-                    const open = () => {
-                        setTimeout(() => this.selectedOpen = true, 10)
-                    }
-
-                    open()
-                    if (this.selectedOpen) {
-                        this.selectedOpen = false
-                        setTimeout(open, 10)
-                    }
-                }
-
-                nativeEvent.stopPropagation()
-            },
-            viewDay({date}) {
-                this.focus = date
-                this.type = 'day'
-            },
-            getEventColor(event) {
-                return event.color
-            },
-            setToday() {
-                this.focus = this.today
-            },
-            prev() {
-                this.$refs.calendar.prev()
-            },
-            next() {
-                this.$refs.calendar.next()
-            },
-            updateRange({start, end}) {
-
-                const events = []
-
-                const min = new Date(`${start.date}T00:00:00`)
-                const max = new Date(`${end.date}T23:59:59`)
-                const days = (max.getTime() - min.getTime()) / 86400000
-                const eventCount = this.rnd(days, days + 20)
-
-                // for (let i = 0; i < eventCount; i++) {
-                //     const allDay = this.rnd(0, 3) === 0
-                //     const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-                //     const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-                //     const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-                //     const second = new Date(first.getTime() + secondTimestamp)
-                //
-                //     let generatedEvent = {
-                //         name: this.names[this.rnd(0, this.names.length - 1)],
-                //         start: this.formatDate(first, !allDay),
-                //         end: this.formatDate(second, !allDay),
-                //         color: this.colors[this.rnd(0, this.colors.length - 1)],
-                //     }
-                //     // debugger
-                //     events.push(generatedEvent)
-                // }
-
-                if (this.promotionEvent.id &&
-                    this.promotionEvent.id === 'PROMOTION_ID' &&
-                    this.events.findIndex(e => e.id === 'PROMOTION_ID') === -1) {
-                    events.push(this.promotionEvent)
-                }
-
-
-                this.$forceUpdate()
-                this.start = start
-                this.end = end
-                this.events = events
-            },
-            nth(d) {
-                return d > 3 && d < 21
-                    ? 'th'
-                    : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][d % 10]
-            },
-            rnd(a, b) {
-                return Math.floor((b - a + 1) * Math.random()) + a
-            },
-            formatDate(a, withTime) {
-                return withTime
-                    ? `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
-                    : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`
-            },
+                this.startTime = new Date(this.promotion.startDate).getHours() + ':' + new Date(this.promotion.startDate).getMinutes()
+                this.endTime = new Date(this.promotion.endDate).getHours() + ':' + new Date(this.promotion.endDate).getMinutes()
+                this.events.pop();
+                this.events.push(e)
+            }
         }
 
+        public savePromotionStartTime() {
+            this.modal1 = false;
+            this.promotionEvent.start = this.start.date + ' ' + this.startTime
+            if (new Date(this.promotionEvent.start) > new Date(this.promotionEvent.end)) {
+                this.promotionEvent.start = this.promotionEvent.end
+                this.startTime = new Date(this.promotionEvent.end).getHours() + ':' + new Date(this.promotionEvent.end).getMinutes()
+            } else if (new Date(this.promotionEvent.start) < new Date()) {
+                this.promotionEvent.start = new Date().toISOString().slice(0, 10)
+            }
+            this.$bus.$emit('promotionStartDate', this.promotionEvent.start)
+        }
+
+        public savePromotionEndTime() {
+            this.modal2 = false;
+            this.promotionEvent.end = this.start.date + ' ' + this.endTime
+            if (new Date(this.promotionEvent.end) < new Date(this.promotionEvent.start)) {
+                this.promotionEvent.end = this.promotionEvent.start
+                this.endTime = new Date(this.promotionEvent.start).getHours() + ':' + new Date(this.promotionEvent.start).getMinutes()
+            }
+            this.$bus.$emit('promotionEndDate', this.promotionEvent.end)
+        }
+
+        public addEvent(eventTime : any) {
+            let eventDateTime = new Date(eventTime.date + ' ' + eventTime.time)
+            let currentDateTime = new Date()
+            if (eventDateTime < currentDateTime) {
+                this.$bus.$emit('status', {text: 'Cannot not set event in past', color: 'error'})
+                return
+            }
+
+            //  removing old if it exists
+            if (this.promotionEvent.id === 'PROMOTION_ID') {
+                this.deletePromotionEvent()
+            }
+
+            let e = {
+                id: 'PROMOTION_ID',
+                name: this.subordinate.name + '\'s promotion',
+                start: this.formatDate(new Date(eventTime.date + ' ' + eventTime.time), -1),
+                end: this.formatDate(new Date(eventTime.date + ' ' + eventTime.time), -1),
+                color: this.colors[this.rnd(0, this.colors.length - 1)],
+            }
+
+            this.events.push(e)
+            this.promotionEvent = e;
+            this.startTime = eventTime.time
+            this.endTime = eventTime.time
+            this.$bus.$emit('promotionStartDate', eventTime.date + ' ' + eventTime.time)
+            this.$bus.$emit('promotionEndDate', eventTime.date + ' ' + eventTime.time)
+        }
+
+        public deletePromotionEvent() {
+            this.events.pop()
+            this.promotionEvent = {}
+            this.promotionEventOpen = false
+            this.startTime = null
+            this.endTime = null
+        }
+
+        public showEvent(val : any) {
+            this.selectedEvent = val.event
+            this.selectedElement = val.nativeEvent.target
+
+            if (val.event.id && val.event.id === 'PROMOTION_ID') {
+                const openPromotionMenu = () => {
+                    setTimeout(() => this.promotionEventOpen = true, 10)
+                }
+
+                openPromotionMenu()
+                if (this.promotionEventOpen) {
+                    this.promotionEventOpen = false
+                    setTimeout(openPromotionMenu, 10)
+                }
+            } else {
+                const open = () => {
+                    setTimeout(() => this.selectedOpen = true, 10)
+                }
+
+                open()
+                if (this.selectedOpen) {
+                    this.selectedOpen = false
+                    setTimeout(open, 10)
+                }
+            }
+            val.nativeEvent.stopPropagation()
+        }
+
+        public viewDay(val : any) {
+            this.focus = val.date
+            this.type = 'day'
+        }
+
+        public getEventColor(event : any) {
+            return event.color
+        }
+
+        public setToday() {
+            this.focus = this.today
+        }
+
+        public prev() {
+            this.$refs.calendar.prev()
+        }
+
+        public next() {
+            this.$refs.calendar.next()
+        }
+
+        public updateRange(val : any) {
+
+            const events = []
+
+            const min = new Date(`${val.start.date}T00:00:00`)
+            const max = new Date(`${val.end.date}T23:59:59`)
+            const days = (max.getTime() - min.getTime()) / 86400000
+
+            const eventCount = this.rnd(days, days + 20)
+            // for (let i = 0; i < eventCount; i++) {
+            //     const allDay = this.rnd(0, 3) === 0
+            //     const firstTimestamp = this.rnd(min.getTime(), max.getTime())
+            //     const first = new Date(firstTimestamp - (firstTimestamp % 900000))
+            //     const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
+            //     const second = new Date(first.getTime() + secondTimestamp)
+            //
+            //     let generatedEvent = {
+            //         name: this.names[this.rnd(0, this.names.length - 1)],
+            //         start: this.formatDate(first, !allDay),
+            //         end: this.formatDate(second, !allDay),
+            //         color: this.colors[this.rnd(0, this.colors.length - 1)],
+            //     }
+            //     // debugger
+            //     events.push(generatedEvent)
+            // }
+
+            if (this.promotionEvent.id &&
+                this.promotionEvent.id === 'PROMOTION_ID' &&
+                this.events.findIndex(e => e.id === 'PROMOTION_ID') === -1) {
+                events.push(this.promotionEvent)
+            }
+
+            this.$forceUpdate()
+            this.start = val.start
+            this.end = val.end
+            this.events = events
+        }
+
+        public nth(d : any) {
+            return d > 3 && d < 21
+                ? 'th'
+                : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][d % 10]
+        }
+
+        public rnd(a : any, b : any) {
+            return Math.floor((b - a + 1) * Math.random()) + a
+        }
+
+        public formatDate(a : any, withTime : any) {
+            return withTime
+                ? `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
+                : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`
+        }
     }
 </script>
 

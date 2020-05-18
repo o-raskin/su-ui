@@ -26,7 +26,6 @@ Vue.filter('formatDate', function (value: any) {
 Vue.filter('formatDateTime', function (value: any) {
     if (value) {
         let d = moment(String(value)).format('hh:mm DD.MM.YYYY');
-        debugger
         if (!d || d === 'Invalid date') {
             d = moment(String(value), 'YYYY-MM-DD').format('DD.MM.YYYY');
         }
