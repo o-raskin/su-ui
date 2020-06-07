@@ -10,9 +10,14 @@ export const store = new Vuex.Store({
 
     state: {
         currentUser: JSON.parse(localStorage.getItem('user-data') || '{}'),
+        userLocale: localStorage.getItem('user-locale') || 'en',
     },
 
     mutations: {
+        setUserLocale(state, payload: string) {
+            localStorage.setItem('user-locale', payload)
+            state.userLocale = payload
+        },
         setUser(state, payload: IUser) {
             localStorage.setItem('user-data', JSON.stringify(payload));
             state.currentUser = payload;
@@ -28,6 +33,9 @@ export const store = new Vuex.Store({
     },
 
     actions: {
+        updateUserLocale: function (context, locale) {
+            context.commit('setUserLocale', locale);
+        },
         updateCurrentUserData: function (context) {
             UserAPI.getCurrentUser()
                 .then((userData: IUser) => {

@@ -11,16 +11,18 @@
                         </v-avatar>
                     </v-btn>
                 </template>
-                <span>Go to user profile</span>
+                <span>
+                    {{ $t('go_to_user_page') }}
+                </span>
             </v-tooltip>
 
             <v-toolbar-title class="pl-0">
-                {{ownerSkillBoard.name + '\'s'}}
-                Skill Board
+                {{ $t('skill_board.title', {username: ownerSkillBoard.name}) }}
+
                 <span class="caption text--secondary" v-if="this.latestEditedUserSkill.editorId">
-                    {{'(last review: '}}
+                    {{'(' + $t('skill_board.last_review.title') + ":"}}
                     {{latestEditedUserSkill.lastEditDate | formatDate}}
-                    {{' by ' + latestEditor.name + ")"}}
+                    {{ $t('skill_board.last_review.by_user', {username: latestEditor.name}) + ')' }}
                 </span>
             </v-toolbar-title>
 
@@ -32,7 +34,9 @@
                         <v-icon>mdi-file-table-box</v-icon>
                     </v-btn>
                 </template>
-                <span>Table view</span>
+                <span>
+                    {{ $t('skill_board.table_view') }}
+                </span>
             </v-tooltip>
 
         </v-toolbar>
@@ -45,7 +49,7 @@
                     <v-sheet tile class="pa-4 primary lighten-1">
                         <v-text-field
                                 v-model="search"
-                                :label="filter_default_value"
+                                :label=" $t('skill_board.filter.filter_placeholder') "
                                 dark
                                 flat
                                 solo-inverted
@@ -62,10 +66,12 @@
                                                 v-model="caseSensitive"
                                                 dark
                                                 hide-details
-                                                label="case sensitive"
+                                                :label=" $t('skill_board.filter.case_sensitive_filter.title') "
                                         ></v-checkbox>
                                     </template>
-                                    <span>Turn on case sensitive filter</span>
+                                    <span>
+                                        {{ $t('skill_board.filter.case_sensitive_filter.tooltip') }}
+                                    </span>
                                 </v-tooltip>
                             </div>
                             <div>
@@ -76,10 +82,12 @@
                                                 v-model="needForGrade"
                                                 dark
                                                 hide-details
-                                                label="next grade"
+                                                :label=" $t('skill_board.filter.next_grade_filter.title') "
                                         ></v-checkbox>
                                     </template>
-                                    <span>Show only skill required for next grade</span>
+                                    <span>
+                                        {{ $t('skill_board.filter.next_grade_filter.tooltip') }}
+                                    </span>
                                 </v-tooltip>
                                 <v-spacer/>
                                 <v-tooltip bottom>
@@ -89,10 +97,12 @@
                                                 v-model="relearn"
                                                 dark
                                                 hide-details
-                                                label="relearn"
+                                                :label=" $t('skill_board.filter.relearn_filter.title') "
                                         ></v-checkbox>
                                     </template>
-                                    <span>Show only skills, that need to be relearned</span>
+                                    <span>
+                                        {{ $t('skill_board.filter.relearn_filter.tooltip') }}
+                                    </span>
                                 </v-tooltip>
                             </div>
                         </v-container>
@@ -115,7 +125,7 @@
             <v-col>
                 <template v-if="this.activeSkill === null">
                     <p class="title grey--text text--lighten-1 font-weight-light">
-                        Choose skill...
+                        {{ $t('skill_board.choose_skill_placeholder') }}
                     </p>
                 </template>
                 <template v-else>
@@ -246,9 +256,11 @@
         }
 
         public isRelearnedSkill(skill: ISkill): boolean {
+            // debugger
             let us = this.userSkillsData.find(us => us.skill.id === skill.id);
             if (us) {
-                return us.status !== 'APPROVED' && (this.allUserGrades.map(g => g.id).indexOf(skill.gradeId) !== -1);
+                return us.status === 'RELEARNING';
+                // return us.status !== 'APPROVED' && (this.allUserGrades.map(g => g.id).indexOf(skill.gradeId) !== -1);
             }
             return false;
         }
@@ -272,11 +284,16 @@
                 })
         }
 
+        get skillBoardUser() : IUser {
+            return this.user ? this.user : this.currentUser
+        }
+
         public fetchAllSkillsUserData() {
             SkillsAPI.getAll()
                 .then(r => this.skills = r.data)
 
-            SkillsAPI.getUserSkills(this.user)
+            // debugger
+            SkillsAPI.getUserSkills(this.ownerSkillBoard)
                 .then(r => this.userSkillsData = r.data);
 
             SkillsAPI.getUserById(this.ownerSkillBoardId)
@@ -285,7 +302,7 @@
             SkillsGradeAPI.getAll()
                 .then(r => this.grades = r.data);
 
-            SkillsGradeAPI.getPreviousUserGrades(this.user)
+            SkillsGradeAPI.getPreviousUserGrades(this.ownerSkillBoard)
                 .then(r => {
                     this.allUserGrades = r.data
                 });

@@ -650,7 +650,6 @@
             UserRoleAPI.getAll()
                 .then(r => {
                     this.roles = r.data;
-                    debugger
                 })
         }
 

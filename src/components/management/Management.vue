@@ -3,13 +3,13 @@
         <v-tabs-slider></v-tabs-slider>
 
         <v-tab>
-            Common
+            {{ $t('management.common_tab.title') }}
         </v-tab>
         <v-tab>
-            Users
+            {{ $t('management.users_tab.title') }}
         </v-tab>
         <v-tab>
-            Skills
+            {{ $t('management.skills_tab.title') }}
         </v-tab>
         <v-tab-item>
             Common info

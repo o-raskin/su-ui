@@ -10,12 +10,13 @@
                                 </v-avatar>
                             </v-btn>
                         </template>
-                        <span>Go to user profile</span>
+                        <span>
+                            {{ $t('go_to_user_page') }}
+                        </span>
                     </v-tooltip>
 
                     <v-toolbar-title>
-                        {{ownerSkillBoard.name + '\'s'}}
-                        Skill Table
+                        {{ $t('skill_table.title', {username: ownerSkillBoard.name}) }}
                     </v-toolbar-title>
 
                     <v-spacer/>
@@ -26,7 +27,9 @@
                                 <v-icon>mdi-printer</v-icon>
                             </v-btn>
                         </template>
-                        <span>Print page</span>
+                        <span>
+                            {{ $t('skill_table.print') }}
+                        </span>
                     </v-tooltip>
 
                     <v-tooltip bottom>
@@ -35,7 +38,9 @@
                                 <v-icon>mdi-card-bulleted</v-icon>
                             </v-btn>
                         </template>
-                        <span>Board view</span>
+                        <span>
+                            {{ $t('skill_table.board_view') }}
+                        </span>
                     </v-tooltip>
 
                 </v-toolbar>
@@ -44,8 +49,9 @@
 
         <v-row>
             <v-data-table
+                    :locale="this.currentLocale"
                     :headers="headers"
-                    :items="this.skillsUser.skills"
+                    :items="this.displayData"
                     :items-per-page="13"
                     class="elevation-1 ma-auto mt-3"
             ></v-data-table>
@@ -83,38 +89,56 @@
         public skills: ISkill[] = [];
         public headers: any[] = [
             {
-                text: 'Name',
+                text: this.getLocalizedMessage('skill.name'),
                 value: 'skill.name',
             },
-            {text: 'Status', value: 'status'},
-            {text: 'Completion', value: 'skill.success'},
-            {text: 'Start date', value: 'startDate'},
-            {text: 'End date', value: 'endDate'},
-            {text: 'Next grade', value: 'this.requiredForNextGrade(skill)'}
+            {text: this.getLocalizedMessage('skill.status'), value: 'status'},
+            {text: this.getLocalizedMessage('skill.start_date'), value: 'startDate'},
+            {text: this.getLocalizedMessage('skill.end_date'), value: 'endDate'},
+            {text: this.getLocalizedMessage('skill.grade'), value: 'grade'}
         ]
 
-        // get displayedSkills() {
-        //     let arr = this.skillsUser.skills;
-        //     return arr.map(s => {
-        //         if (s.skill.name === 'test') {
-        //             s.required = true
-        //             return s;
-        //         }
-        //         return false;
-        //     })
-        // }
-
-        /**
-         *  under our grade: -1 and below
-         *  our grade: 0
-         *  for next grade: 1
-         *  higher grades: 2 and higher
-         */
-        public requiredForNextGrade(skill: ISkill): boolean {
-            if (!!this.skillsUser.grade) {
-                return skill.previousGradeId === this.skillsUser.grade.id
+        get displayData() : any[] {
+            if (!this.skillsUser || !this.skillsUser.skills) {
+                return []
             }
-            return false;
+
+            // ТУТ ПОДГОТОВКА ДАННЫХ
+            for (let i = 0; i < this.skillsUser.skills.length; i++) {
+
+                //@ts-ignore
+                this.skillsUser.skills[i].completion = 44;
+
+                let s = this.skills.find(s => s.id === this.skillsUser.skills[i].skill.id);
+                if (s && s.gradeId) {
+                    let grade = this.grades.find(g => s && g.id === s.gradeId);
+                    //@ts-ignore
+                    this.skillsUser.skills[i].grade = grade.name;
+                }
+
+                this.skillsUser.skills[i].status = this.getLocalizedStatus(this.skillsUser.skills[i].status).toString()
+            }
+
+            return this.skillsUser.skills;
+        }
+
+        public getLocalizedMessage(key : string) {
+            return this.$t(key)
+        }
+
+        public getLocalizedStatus(status : string) {
+            return this.$t('skill_card.status.' + status.toLowerCase())
+        }
+
+        get currentLocale() : string {
+            switch (this.$i18n.locale) {
+                case 'ru':
+                    return 'ru-RU';
+                case 'en':
+                    return 'en-US';
+                default:
+                    return 'en-US';
+            }
         }
 
         @Watch("ownerSkillBoardId")
@@ -140,10 +164,8 @@
             SkillsAPI.getAll()
                 .then(r => this.skills = r.data)
 
-            debugger
             SkillsAPI.getUserById(this.ownerSkillBoardId)
                 .then(r => {
-                    debugger
                     this.skillsUser = r.data
                 });
 
@@ -168,7 +190,6 @@
         mounted() {
 
             if (!this.isAuthorizedUserProfile) {
-
                 UserAPI.getUserById(this.ownerSkillBoardId)
                     .then(r => {
                         this.user = r.data

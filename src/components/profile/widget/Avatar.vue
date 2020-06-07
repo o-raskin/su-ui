@@ -48,12 +48,14 @@
                         >
                             <v-list-item-title class="text-uppercase text-center">
                                 <v-btn dark class="pl-5 pr-5" color="green">
-                                    {{btn_approve_grade_text}}
+                                    {{ $t('profile.widget.avatar.action.approve_grade') }}
                                 </v-btn>
                             </v-list-item-title>
                         </v-list-item>
                 </template>
-                <span>User get enough progress in current grade, you can approve he's grade up</span>
+                <span>
+                    {{ $t('profile.widget.avatar.action.approve_grade_desc') }}
+                </span>
             </v-tooltip>
 
 
@@ -72,7 +74,7 @@
                     v-if="followBtnEnable"
             >
                 <v-list-item-title class="text-uppercase text-center">
-                    {{btn_follow_text}}
+                    {{ $t('profile.widget.avatar.action.follow') }}
                 </v-list-item-title>
             </v-list-item>
 
@@ -83,7 +85,7 @@
 
             >
                 <v-list-item-title class="text-uppercase text-center">
-                    {{btn_unfollow_text}}
+                    {{ $t('profile.widget.avatar.action.unfollow') }}
                 </v-list-item-title>
             </v-list-item>
         </v-list>

@@ -1,0 +1,223 @@
+{
+  "go_to_user_page": "Перейти к странице пользователя",
+  "management": {
+    "common_tab": {
+      "title": "Общее"
+    },
+    "users_tab": {
+      "title": "Пользователи"
+    },
+    "skills_tab": {
+      "title": "Навыки"
+    }
+  },
+  "employees_board": {
+    "title": "Сотрудники",
+    "search": {
+      "placeholder": "Поиск по сотрудникам..."
+    },
+    "pagination": {
+      "items_per_page": "Элементов на странице",
+      "page_number": "Страница",
+      "page_count_article": "из"
+    }
+  },
+  "planning_board": {
+    "title": "Доска планирования",
+    "promotion_title": "Продвижение {username}",
+    "subordinates_list": {
+      "title": "Подчиненные",
+      "help_tooltip": "Подчиненные, которые достигли 100% прогресса для достижения следующего грейда"
+    },
+    "promotion_placeholder": "Выберите подчиненного...",
+    "promotion_card": {
+      "action": {
+        "cancel": "отменить",
+        "create": "создать",
+        "update": "обновить"
+      },
+      "promotion": {
+        "status": {
+          "tooltip": "Статус продвижения",
+          "created": "СОЗДАН",
+          "not_created": "НЕ СОЗДАН",
+          "successfully": "УСПЕШНО",
+          "failed": "ПРОВАЛЕНО"
+        },
+        "invited_field": {
+          "title": "Приглашены",
+          "empty_value": "Никто",
+          "placeholder": "Введите или выберите..."
+        },
+        "promotion_date_field": {
+          "error": "Нельзя запланировать встречу до текущего момента!",
+          "title": "Дата продвижения",
+          "empty_value": "Не назначена",
+          "starts": "Начало",
+          "ends": "Конец"
+        },
+        "action": {
+          "success": {
+            "title": "ПРОШЕЛ",
+            "modal_question": "Подтвердить продвижение на следующий грейд?",
+            "modal_question_hint": "Это действие нельзя отменить",
+            "modal_positive_answer": "Да",
+            "modal_negative_answer": "Нет"
+          },
+          "fail": "ПРОВАЛИЛ"
+        }
+      },
+      "previous_promotions": {
+        "title": "Предыдущие продвижения"
+      }
+    }
+  },
+  "skill_card": {
+    "materials": "Материалы",
+    "status": {
+      "not_mandatory": "НЕ ОБЯЗАТЕЛЬНЫЙ",
+      "not_mandatory_desc": "Не обязательно изучать навык прямо сейчас",
+      "need_to_know": "НУЖНО ЗНАТЬ",
+      "need_to_know_desc": "Необходимо изучить, чтобы перейти на следующий грейд",
+      "in_progress": "В ПРОЦЕССЕ",
+      "in_progress_desc": "В процессе изучения навыка",
+      "pending": "НА ПОДТВЕРЖДЕНИИ",
+      "pending_desc": "Ожидание подтверждения со стороны руководителя",
+      "approved": "ПОДТВЕРЖДЕН",
+      "approved_desc": "Подтвержден руководителем",
+      "relearning": "ПЕРЕИЗУЧЕНИЕ",
+      "relearning_desc": "Направлен на переизучение"
+    },
+    "action": {
+      "complete": "закончить изучение",
+      "learn": "учить",
+      "stop_learning": "прервать изучение",
+      "reject": "отказать",
+      "approve": "подтвердить",
+      "relearn": "отправить на переизучение"
+    }
+  },
+  "skill": {
+    "name": "Название",
+    "status": "Статус",
+    "completion": "Прогресс изучения",
+    "start_date": "Дата начала изучения",
+    "end_date": "Дата завершения изучения",
+    "grade": "Грейд"
+  },
+  "skill_board": {
+    "title": "Навыки пользователя {username}",
+    "last_review": {
+      "title": "последний обзор",
+      "by_user": "пользователем: {username}"
+    },
+    "filter": {
+      "filter_placeholder": "Введите название навыка...",
+      "case_sensitive_filter": {
+        "title": "чувствительный к регистру",
+        "tooltip": "Включить чувствительную к регистру фильтрацию"
+      },
+      "next_grade_filter": {
+        "title": "на следующий грейд",
+        "tooltip": "Показывать навыки, необходимые для повышения на следующий грейд"
+      },
+      "relearn_filter": {
+        "title": "переизучение",
+        "tooltip": "Показывать навыки, которые отправлены для изучения заново"
+      }
+    },
+    "table_view": "Табличный вид",
+    "choose_skill_placeholder": "Выберите навык...",
+    "success_criterion": {
+      "title": "Критерии изучения"
+    }
+  },
+  "skill_table": {
+    "title": "Табличный вид навыков пользователя {username}",
+    "board_view": "Показать в виде доски",
+    "print": "Распечатать страницу"
+  },
+  "sidebar": {
+    "point": {
+      "home": "Главная",
+      "skill_board": "Доска навыков",
+      "planning": "Планирование",
+      "employees": "Сотрудники",
+      "management": "Управление системой",
+      "settings": "Настройки"
+    }
+  },
+  "auth": {
+    "logout": "Выйти",
+    "welcome_message": "Добро пожаловать!",
+    "login_message": "Пожалуйса, войдите в систему!",
+    "login_btn": "ВОЙТИ"
+  },
+  "profile": {
+    "settings": {
+      "title": "Настройки профиля",
+      "privacy": {
+        "title": "Доступ к профилю",
+        "visibility": {
+          "on": "Открытый профиль",
+          "off": "Закрытый профиль",
+          "off_description": "Только важные пользователи и пользователи из вашего списка могут заходить к вам в профиль",
+          "whitelist": {
+            "title": "Предоставлен доступ"
+          }
+        }
+      },
+      "language": {
+        "title": "Язык"
+      }
+    },
+    "widget": {
+      "avatar": {
+        "action": {
+          "approve_grade": "ПОВЫСИТЬ",
+          "approve_grade_desc": "Сотрудник достиг необходимого прогресса, вы можете подтвердить его повышение на следующий грейд",
+          "follow": "ПОДПИСАТЬСЯ",
+          "unfollow": "ОТПИСАТЬСЯ"
+        }
+      },
+      "grade_progress": {
+        "title": "Прогресс"
+      },
+      "main_info": {
+        "whitelist_action": "Добавить в список избранных",
+        "skill_board_action": "Обзор доски навыков",
+        "profile_tab": {
+          "title": "Профиль",
+          "mentor_field": "Руководитель",
+          "promotion_field": "Продвижение",
+          "last_promotion_field": "Дата последнего продвижения",
+          "in_company_since_field": "В компании с"
+        },
+        "followers_tab": {
+          "title": "Подписчики"
+        },
+        "following_tab": {
+          "title": "Подписки"
+        }
+      },
+      "subordinates": {
+        "title": "Подчиненные",
+        "grade_progress_tooltip_desc": "Прогресс"
+      },
+      "activity": {
+        "title": "Активность",
+        "graph_desc": "Навыки изученные за последние 12 месяцев",
+        "graph_units": "скилл/месяц",
+        "last_approve_date": "Последний подтвержденный",
+        "last_pending_date": "Последний законченный"
+      },
+      "history": {
+        "title": "История получения навыков"
+      },
+      "timeline": {
+        "title": "История событий",
+        "first_day": "Первый день"
+      }
+    }
+  }
+}

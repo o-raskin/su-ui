@@ -8,20 +8,35 @@
                     </v-icon>
                 </v-list-item-avatar>
                 <v-list-item-title>
-                    {{profileSettingsTitle_text}}
+                    {{ $t('profile.settings.title') }}
                 </v-list-item-title>
             </v-list-item>
         </template>
         <v-card>
             <v-card-title class="text-center">
-                <span>{{profileSettingsTitle_text}}</span>
+                <span>{{ $t('profile.settings.title') }}</span>
             </v-card-title>
             <v-card-text>
+
+                <!--    LANGUAGE    -->
+
+                <div>
+                    <span class="body-1 text--primary">{{ $t('profile.settings.language.title') }}</span>
+                    <v-radio-group
+                            @change="switchLocale"
+                            class="ml-5"
+                            v-model="userLocale"
+
+                            :mandatory="false">
+                        <v-radio label="English" value="en"></v-radio>
+                        <v-radio label="Русский" value="ru"></v-radio>
+                    </v-radio-group>
+                </div>
 
                 <!--    PROFILE VISIBILITY  -->
 
                 <div>
-                    <span class="body-1 text--primary">{{privacy_title_text}}</span>
+                    <span class="body-1 text--primary">{{ $t('profile.settings.privacy.title') }}</span>
                     <v-list>
                         <v-list-item>
                             <v-list-item-action>
@@ -33,15 +48,14 @@
                                 </v-switch>
                             </v-list-item-action>
                             <v-list-item-title v-if="currentUserProfile.visibility">
-                                {{visible_profile_text}}
+                                {{ $t('profile.settings.privacy.visibility.on') }}
                             </v-list-item-title>
-                            <v-list-item-title v-if="!currentUserProfile.visibility">
-                                {{invisible_profile_text}}
-                                <span
-                                        class="caption text-break"
-                                        v-if="!currentUserProfile.visibility">
-                                <br/>{{invisible_profile_subtitle_text}}
-                            </span>
+                            <v-list-item-title v-if="!currentUserProfile.visibility" >
+                                {{ $t('profile.settings.privacy.visibility.off') }}
+                                <span class="caption text-break desc-work-breaker" v-if="!currentUserProfile.visibility">
+                                    <br/>
+                                    {{ $t('profile.settings.privacy.visibility.off_description') }}
+                                </span>
                             </v-list-item-title>
                         </v-list-item>
                     </v-list>
@@ -52,7 +66,7 @@
 
                         <template v-for="(person, index) in currentUserProfile.whitelist">
                             <v-subheader>
-                                {{whitelist_title_text}}
+                                {{ $t('profile.settings.privacy.visibility.whitelist.title') }}
                             </v-subheader>
 
                             <v-divider/>
@@ -100,6 +114,16 @@
 
         public dialog: boolean = false;
 
+        public userLocale: string = this.$store.state.userLocale;
+
+        public switchLocale() {
+            if (this.$i18n.locale !== this.userLocale) {
+                this.$i18n.locale = this.userLocale;
+                this.$store.dispatch('updateUserLocale', this.userLocale)
+                window.location.reload()
+            }
+        }
+
         public updateCurrentUserProfile() {
             this.$store.dispatch('updateProfile', this.currentUserProfile)
         }
@@ -131,3 +155,9 @@
         }
     }
 </script>
+
+<style lang="scss" scoped>
+    .desc-work-breaker {
+        white-space: normal;
+    }
+</style>

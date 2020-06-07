@@ -16,6 +16,17 @@
                     </v-list-item-title>
                 </v-list-item>
             </template>
+            <v-list-item @click="gotoPath('Management')"
+                         link
+                         v-if="this.currentUser.id === 951"
+            >
+                <v-list-item-icon>
+                    <v-icon>mdi-account-cog</v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>
+                    {{this.getLocalizedMessage('sidebar.point.management')}}
+                </v-list-item-title>
+            </v-list-item>
         </v-list>
     </v-navigation-drawer>
 </template>
@@ -39,18 +50,22 @@
          *  Routing
          */
         public items: any[] = [
-            {title: 'Home', icon: 'mdi-home', name: 'Home', condition: true},
-            {title: 'Skill Board', icon: 'mdi-electron-framework', name: 'SkillBoard', condition: true},
+            {title: this.getLocalizedMessage('sidebar.point.home'), icon: 'mdi-home', name: 'Home', condition: true},
+            {title: this.getLocalizedMessage('sidebar.point.skill_board'), icon: 'mdi-electron-framework', name: 'SkillBoard', condition: true},
             {
-                title: 'Planning',
+                title: this.getLocalizedMessage('sidebar.point.planning'),
                 icon: 'mdi-calendar-multiselect',
                 name: 'PlanningBoard',
                 condition: false
             },
-            {title: 'Employees', icon: 'mdi-account-supervisor', name: 'ProfilesBoard', condition: true},
-            {title: 'Management', icon: 'mdi-account-cog', name: 'Management', condition: true},
-            {title: 'System settings', icon: 'mdi-tune-vertical', name: '', disabled: true, condition: true},
+            {title: this.getLocalizedMessage('sidebar.point.employees'), icon: 'mdi-account-supervisor', name: 'ProfilesBoard', condition: true},
         ];
+            // {title: this.getLocalizedMessage('sidebar.point.management'), icon: 'mdi-account-cog', name: 'Management', condition: true},
+            // {title: this.getLocalizedMessage('sidebar.point.settings'), icon: 'mdi-tune-vertical', name: '', disabled: true, condition: true},
+
+        public getLocalizedMessage(key : string) {
+            return this.$t(key)
+        }
 
         mounted() {
             this.fetchSubordinatesCount();

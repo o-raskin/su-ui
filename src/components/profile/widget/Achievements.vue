@@ -1,7 +1,7 @@
 <template>
-    <v-card class="custom-card-border" outlined v-if="histories.length">
+    <v-card class="custom-card-border" outlined v-if="user.inCompanySince">
         <v-toolbar height="40px" color="primary" dense short dark elevation="0">
-            <v-toolbar-title class="subtitle-2">{{'Timeline'}}</v-toolbar-title>
+            <v-toolbar-title class="subtitle-2">{{ $t('profile.widget.timeline.title') }}</v-toolbar-title>
         </v-toolbar>
 
         <v-content class="text-center  pa-1 overflow-y-auto ">
@@ -12,18 +12,18 @@
                         :key="i"
                 >
                     <span class="text--secondary body-2" slot="opposite">{{history.achievedDate | formatDate}}</span>
-                    <v-card v-bind:style= "[i % 2 ? {right: 0} : {left: 0}]"
+                    <v-card v-bind:style="[i % 2 ? {right: 0} : {left: 0}]"
                             style="position: absolute"
-                            max-width="200px"  class="elevation-2 pa-2">
-                        <v-card-text class="body-1 text--primary pa-0 timeline-item-text">{{history.grade.name}}</v-card-text>
+                            max-width="200px" class="elevation-2 pa-2">
+                        <v-card-text class="body-1 text--primary pa-0 timeline-item-text">{{history.grade.name}}
+                        </v-card-text>
                     </v-card>
                 </v-timeline-item>
-                <v-timeline-item large icon="mdi-flag">
-                    <span class="text--secondary body-2" slot="opposite">{{user.inCompanySince | formatDate}}</span>
-                    <v-card dark color="green" style="position: absolute; right: 0"
-                            max-width="250px"  class="elevation-2 pa-2 mt-2">
-                        <v-card-text class="body-1 pa-0 timeline-item-text">{{'First day'}}</v-card-text>
-                    </v-card>
+
+                <v-timeline-item color="green" large icon="mdi-flag">
+                    <span class="text--secondary body-2" slot="opposite">
+                        {{user.inCompanySince | formatDate}}
+                    </span>
                 </v-timeline-item>
             </v-timeline>
 
@@ -74,6 +74,7 @@
         max-width: 200px;
         word-break: break-word;
     }
+
     .timeline-item-text {
         max-width: 250px;
     }

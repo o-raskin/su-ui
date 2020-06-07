@@ -13,16 +13,16 @@
                     </v-list-item-icon>
                     <v-list-item-content>
                         <v-list-item-title>
-                            {{'Promotion date: '}}
+                            {{ $t('planning_board.promotion_card.promotion.promotion_date_field.title') + ':' }}
                         </v-list-item-title>
                         <v-list-item-subtitle v-if="promotionEvent.start">
-                            {{'Starts: '}} {{promotionEvent.start | formatDateTime}}
+                            {{ $t('planning_board.promotion_card.promotion.promotion_date_field.starts') + ':' }} {{promotionEvent.start | formatDateTime}}
                         </v-list-item-subtitle>
                         <v-list-item-subtitle v-else>
-                            {{'Not assigned'}}
+                            {{ $t('planning_board.promotion_card.promotion.promotion_date_field.empty_value') }}
                         </v-list-item-subtitle>
                         <v-list-item-subtitle v-if="promotionEvent.end">
-                            {{'Ends: '}} {{promotionEvent.end | formatDateTime }}
+                            {{ $t('planning_board.promotion_card.promotion.promotion_date_field.ends') + ':' }} {{promotionEvent.end | formatDateTime }}
                         </v-list-item-subtitle>
                     </v-list-item-content>
                 </v-list-item>
@@ -86,7 +86,7 @@
                                 @click:time="addEvent"
                                 @change="updateRange"
                                 :weekdays="weekdays"
-                                :locale="locale"
+                                :locale="calendarLocale"
                         ></v-calendar>
                         <v-menu
                                 v-model="selectedOpen"
@@ -109,12 +109,12 @@
                                 <v-card-text>
                                     <span>
                                         <span class="text--primary">{{'Starts: '}}</span>
-                                        {{selectedEvent.start}}
+                                        {{selectedEvent.start | formatDateTime}}
                                     </span>
                                     <br/>
                                     <span>
                                         <span class="text--primary">{{'Ends: '}}</span>
-                                        {{selectedEvent.end}}
+                                        {{selectedEvent.end | formatDateTime}}
                                     </span>
                                     <br/>
                                     <span v-html="selectedEvent.details"></span>
@@ -271,13 +271,8 @@
         @Prop()
         public eventsData!: IEvent[];
 
-        @Watch("eventsData")
-        public watchReceivedEventsData(val: IEvent[], old: any) {
-            if (val && val.length > 0) {
-                // this.events = val.map(data => this.generateEvent(data));
-            }
-        }
-
+        @Prop()
+        public users!: IUser[];
 
         public promotionEventOpen: boolean = false;
         public start: any = null;
@@ -298,7 +293,7 @@
         public colors: any[] = ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'];
         public focus: any = '';
         public type: string = 'month';
-        public today: any = new Date().toISOString().slice(0, 10);
+        public today: any = new Date().toISOString().slice(0, 15);
 
         data() {
             return {
@@ -312,6 +307,18 @@
                 start_time_text: 'Starts: ',
                 end_time_text: 'Ends: ',
             }
+        }
+
+        get calendarLocale() : string {
+            switch (this.$i18n.locale) {
+                case 'ru': {
+                    return "ru-RU"
+                }
+                case 'en': {
+                    return 'en-UK'
+                }
+            }
+            return 'en-UK'
         }
 
         get currentTime() {
@@ -355,11 +362,16 @@
         }
 
         mounted() {
-            // this.$refs.calendar.checkChange()
             this.initEventFromData()
+
+            this.$bus.$on('clearCalendarData', (val : any) => {
+                debugger
+                this.clearData();
+            })
         }
 
         public clearData() {
+            debugger
             this.start = null
             this.end = null
             this.startTime = null
@@ -377,6 +389,7 @@
                 this.events.slice(pIndex, 1);
             }
             this.promotionEventOpen = false
+            this.events = [];
         }
 
         public initEventFromData() {
@@ -423,7 +436,12 @@
             let eventDateTime = new Date(eventTime.date + ' ' + eventTime.time)
             let currentDateTime = new Date()
             if (eventDateTime < currentDateTime) {
-                this.$bus.$emit('status', {text: 'Cannot not set event in past', color: 'error'})
+                this.$bus.$emit('status',
+                    {
+                        text:  this.$t('planning_board.promotion_card.promotion.promotion_date_field.error'),
+                        color: 'error'
+                    }
+                )
                 return
             }
 
@@ -522,7 +540,7 @@
             //     const second = new Date(first.getTime() + secondTimestamp)
             //
             //     let generatedEvent = {
-            //         name: this.names[this.rnd(0, this.names.length - 1)],
+            //         name: 'test-title',
             //         start: this.formatDate(first, !allDay),
             //         end: this.formatDate(second, !allDay),
             //         color: this.colors[this.rnd(0, this.colors.length - 1)],
@@ -530,6 +548,21 @@
             //     // debugger
             //     events.push(generatedEvent)
             // }
+            // events.push(... this.eventsData)
+
+
+            //
+            // let uniq_array = uniqueElementsBy(this.eventsData, (a: IUser, b: IUser) => a.id === b.id);
+            debugger
+            for (let i = 0, len = this.eventsData.length; i < len; i++) {
+                let generatedCalendarEvent = {
+                    name: this.$t('planning_board.promotion_title', {'username': this.getUsernameById(this.eventsData[i].userId)}),
+                    start: this.formatDate(new Date(this.eventsData[i].start), true),
+                    end: this.formatDate(new Date(this.eventsData[i].end), true),
+                    color: this.colors[this.rnd(0, this.colors.length - 1)],
+                }
+                events.push(generatedCalendarEvent)
+            }
 
             if (this.promotionEvent.id &&
                 this.promotionEvent.id === 'PROMOTION_ID' &&
@@ -537,10 +570,17 @@
                 events.push(this.promotionEvent)
             }
 
+            const uniqueElementsBy = (arr : any, fn : any) =>
+                arr.reduce((acc : any, v : any) => {
+                    if (!acc.some((x : any) => fn(v, x))) acc.push(v);
+                    return acc;
+                }, []);
+
             this.$forceUpdate()
             this.start = val.start
             this.end = val.end
-            this.events = events
+            this.events = uniqueElementsBy(events, (a : IEvent, b : IEvent) => a.start === b.start && a.end === b.end)
+            // this.events = events
         }
 
         public nth(d : any) {
@@ -557,6 +597,15 @@
             return withTime
                 ? `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
                 : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`
+        }
+
+        public getUsernameById(userId: number): string {
+            let user = this.users.find(u => u.id === userId)
+            debugger
+            if (!user && userId === this.subordinate.id) {
+                return this.subordinate.name;
+            }
+            return user ? user.name : 'User' + userId
         }
     }
 </script>

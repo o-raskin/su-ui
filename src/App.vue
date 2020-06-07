@@ -27,6 +27,13 @@
                 this.color = status.color
                 this.snackbar = true
             })
+
+        },
+        created() {
+            if (this.$i18n.locale !== this.$store.state.userLocale) {
+                this.$i18n.locale = this.$store.state.userLocale
+            }
+            // get from LOCAL STORAGE and set
         },
         methods: {
             resetSnackbar() {

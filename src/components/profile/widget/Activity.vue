@@ -2,9 +2,12 @@
     <v-card
             class="flex-grow-1 custom-card-border"
             outlined
+            v-if="values.length > 1"
     >
         <v-toolbar height="40px" color="primary" dense short dark elevation="0">
-            <v-toolbar-title class="subtitle-2">Activity</v-toolbar-title>
+            <v-toolbar-title class="subtitle-2">
+                {{ $t('profile.widget.activity.title') }}
+            </v-toolbar-title>
         </v-toolbar>
         <v-sheet
                 class="v-sheet--offset mx-auto mt-2 mb-2 pr-2"
@@ -35,10 +38,10 @@
             <div class="text-center mb-2"
                  v-if="values.length > 1">
                 <span class="title font-weight-light">
-                    {{activity_description_text}}
+                    {{ $t('profile.widget.activity.graph_desc') }}
                 </span>
                 <span>
-                    {{'(' + units + ')'}}
+                    {{'(' + $t('profile.widget.activity.graph_units') + ')'}}
                 </span>
                 <v-divider class="my-2"></v-divider>
             </div>
@@ -52,7 +55,7 @@
                         mdi-clock
                     </v-icon>
                     <span class="caption font-weight-bold green--text">
-                        {{last_approved_text}}
+                        {{ $t('profile.widget.activity.last_approve_date') + ": " }}
                     </span>
                     <span>
                         {{lastApprovedSkillDate | formatDate}}
@@ -68,7 +71,7 @@
                         mdi-clock
                     </v-icon>
                     <span class="caption orange--text font-weight-bold">
-                        {{last_pending_text}}
+                        {{ $t('profile.widget.activity.last_pending_date') + ': '}}
                     </span>
                     <span>
                         {{lastPendingSkillDate | formatDate}}
@@ -159,7 +162,6 @@
                     return this.monthsNames.indexOf(i1.month) - this.monthsNames.indexOf(i2.month)
                 }
             })
-            debugger
             return r;
         }
 

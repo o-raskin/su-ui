@@ -1,7 +1,7 @@
 <template>
     <v-card class="custom-card-border" outlined v-if="subordinates.length > 0">
         <v-toolbar height="40px" color="primary" dense short dark elevation="0">
-            <v-toolbar-title class="subtitle-2">Subordinates</v-toolbar-title>
+            <v-toolbar-title class="subtitle-2">{{ $t('profile.widget.subordinates.title') }}</v-toolbar-title>
         </v-toolbar>
         <v-container class="flex-wrap d-flex pa-1">
             <div :key="index"
@@ -14,9 +14,7 @@
                                 class="ma-1"
                                 max-width="65px"
                                 outlined>
-                            <v-img dark class="ma-1" max-height="100px"
-                                   :src="subordinate.imageUrl"
-                            >
+                            <v-img dark class="ma-1" height="55px" :src="subordinate.imageUrl">
                                 <v-progress-linear :value="getGradeProgressById(subordinate.id)"></v-progress-linear>
                             </v-img>
                         </v-card>
@@ -24,7 +22,7 @@
                     <span class="text-lg-center">
                         {{subordinate.name}}
                         <v-divider color="white" dark/>
-                        {{'Grade progress: ' + getGradeProgressById(subordinate.id) + '%'}}
+                        {{ $t('profile.widget.subordinates.grade_progress_tooltip_desc')  + ': ' + getGradeProgressById(subordinate.id) + '%'}}
                     </span>
                 </v-tooltip>
             </div>
@@ -80,9 +78,9 @@
                             return -1;
                         } else if (subASkillData && subBSkillData) {
                             if (subASkillData.gradeProgress < subBSkillData.gradeProgress) {
-                                return -1;
-                            } else if (subASkillData.gradeProgress > subBSkillData.gradeProgress) {
                                 return 1;
+                            } else if (subASkillData.gradeProgress > subBSkillData.gradeProgress) {
+                                return -1;
                             }
                             return 0;
                         }

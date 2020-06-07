@@ -24,11 +24,13 @@
 
                     <v-list-item-title class="mb-1">
                         <div class="headline">
-                            {{welcome}}
+                            {{ $t('auth.welcome_message') }}
                         </div>
                     </v-list-item-title>
 
-                    <v-list-item-subtitle>{{login_request}}</v-list-item-subtitle>
+                    <v-list-item-subtitle>
+                        {{ $t('auth.login_message') }}
+                    </v-list-item-subtitle>
 
                     <v-divider class="ma-3"/>
 
@@ -71,7 +73,7 @@
                                 @click.prevent="loginWithForm"
                                 color="primary"
                         >
-                            {{login_btn_text}}
+                            {{ $t('auth.login_btn') }}
                         </v-btn>
                     </v-form>
                 </v-list-item-content>

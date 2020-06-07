@@ -83,7 +83,7 @@
                         </v-icon>
                     </v-list-item-avatar>
                     <v-list-item-title>
-                        {{logout_btn_text}}
+                        {{ $t('auth.logout') }}
                     </v-list-item-title>
                 </v-list-item>
                 <!--                    <v-btn color="primary" text @click.prevent="logout">LOGOUT</v-btn>-->

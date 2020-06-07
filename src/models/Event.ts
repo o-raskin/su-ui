@@ -1,7 +1,7 @@
 
 export interface IEvent {
     id: number;
-    name: string;
+    userId: number;
     start: string;
     end: number;
     color: number;
@@ -9,7 +9,7 @@ export interface IEvent {
 
 export class Event implements IEvent {
     id!: number;
-    name!: string;
+    userId!: number;
     start!: string;
     end!: number;
     color!: number;

@@ -2,7 +2,7 @@
     <v-container>
         <v-toolbar dense short flat>
             <v-toolbar-title class="pl-0">
-                Planning board
+                {{ $t('planning_board.title') }}
             </v-toolbar-title>
         </v-toolbar>
 
@@ -17,14 +17,16 @@
                 <v-list dense class="pt-0">
                     <v-subheader>
                         <span class="body-2 text--secondary">
-                            {{'Subordinates:'}}
+                            {{ $t('planning_board.subordinates_list.title') + ':'}}
                         </span>
 
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
                                 <v-icon v-on="on" small>mdi-help-circle</v-icon>
                             </template>
-                            <span>Subordinates whose reached 100% progress</span>
+                            <span>
+                                {{ $t('planning_board.subordinates_list.help_tooltip') }}
+                            </span>
                         </v-tooltip>
                     </v-subheader>
 
@@ -41,8 +43,8 @@
                             <span>
                                 {{subordinate.name}}
                             </span>
-                                    <span class="caption text--secondary">
-                                    {{getGradeByUserId(subordinate.id).name}}
+                                <span class="caption text--secondary">
+                                {{getGradeByUserId(subordinate.id).name}}
                                 </span>
                                 </v-list-item-content>
                             </v-list-item>
@@ -65,7 +67,7 @@
                             class="title grey--text text--lighten-1 font-weight-light"
                             style="align-self: center;"
                     >
-                        Select subordinate...
+                        {{ $t('planning_board.promotion_placeholder') }}
                     </div>
                     <v-card
                             v-else
@@ -75,13 +77,13 @@
                     >
                         <div class="text-center">
                             <v-btn
-                                    v-if="this.isNotCreatedPromotion"
+                                    v-if="this.isNotCreatedPromotion && this.originUserGrade.name !== 'N/A' && this.nextUserGrade.name !== 'N/A'"
                                     @click="createPromotion()"
                                     dark
                                     color="green"
                                     class="custom-card-border ma-2"
                                     elevation="0">
-                                CREATE
+                                {{ $t('planning_board.promotion_card.action.create') }}
                             </v-btn>
 
                             <v-btn
@@ -91,7 +93,7 @@
                                     color="red"
                                     class="custom-card-border ma-2"
                                     elevation="0">
-                                CANCEL
+                                {{ $t('planning_board.promotion_card.action.cancel') }}
                             </v-btn>
 
                             <v-btn
@@ -101,7 +103,7 @@
                                     color="orange"
                                     class="custom-card-border ma-2"
                                     elevation="0">
-                                UPDATE
+                                {{ $t('planning_board.promotion_card.action.update') }}
                             </v-btn>
                         </div>
 
@@ -110,10 +112,12 @@
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-chip v-on="on" small label class="ml-4 mt-2 font-weight-bold">
-                                        {{promotion.status}}
+                                        {{getLocalizedStatus(promotion.status)}}
                                     </v-chip>
                                 </template>
-                                <span>{{'Promotion status'}}</span>
+                                <span>
+                                    {{ $t('planning_board.promotion_card.promotion.status.tooltip') }}
+                                </span>
                             </v-tooltip>
 
                             <v-card-text>
@@ -145,11 +149,14 @@
                                     <template v-slot:activator>
                                         <v-list-item-content>
                                             <v-list-item-title>
-                                                {{'Invited: '}}
+                                                {{ $t('planning_board.promotion_card.promotion.invited_field.title') +
+                                                ': '}}
                                             </v-list-item-title>
                                             <v-list-item-subtitle>
                                                 {{(promotion.members && promotion.members.length > 0 ?
-                                                invitedUsers.map(u => u.name) : 'None').toString()}}
+                                                invitedUsers.map(u => u.name) :
+                                                $t('planning_board.promotion_card.promotion.invited_field.empty_value')
+                                                ).toString()}}
                                             </v-list-item-subtitle>
                                         </v-list-item-content>
                                     </template>
@@ -165,7 +172,7 @@
                                                         return-object
                                                         :items="users"
                                                         chips
-                                                        label="Enter/Select for search..."
+                                                        :label=" $t('planning_board.promotion_card.promotion.invited_field.placeholder') "
                                                         full-width
                                                         hide-details
                                                         hide-no-data
@@ -221,48 +228,53 @@
 
                                 <PlanningCalendar :subordinate="this.selectedUser"
                                                   :promotion="this.promotion"
+                                                  :events-data="this.uniqueElementsBy(this.events, null)"
+                                                  :users="this.users"
                                 />
                                 <!--                                                  :promotion-end-date="this.promotion.endDate"-->
 
                                 <!--    ACTIONS   -->
 
                                 <div class="ma-4 text-center">
-                                    <v-row justify="center">
-                                        <v-dialog v-model="approveModal" persistent max-width="290">
-                                            <template v-slot:activator="{ on }">
-                                                <v-btn
-                                                        outlined
-                                                        v-if="this.isCreatedPromotion"
-                                                        @click="successGradeUp()"
-                                                        dark
-                                                        color="green"
-                                                        class="custom-card-border ma-2"
-                                                        elevation="0">
-                                                    SUCCESS
-                                                </v-btn>
-                                            </template>
-                                            <v-card>
-                                                <v-card-title class="headline">Approve promotion to next grade?</v-card-title>
-                                                <v-card-text>You cannot reverse that decision.</v-card-text>
-                                                <v-card-actions>
-                                                    <v-spacer></v-spacer>
-                                                    <v-btn color="green darken-1" text @click="approveModal = false">Disagree</v-btn>
-                                                    <v-btn color="green darken-1" text @click="approveModal = false">Agree</v-btn>
-                                                </v-card-actions>
-                                            </v-card>
-                                        </v-dialog>
-                                    </v-row>
 
-<!--                                    <v-btn-->
-<!--                                            outlined-->
-<!--                                            v-if="this.isCreatedPromotion"-->
-<!--                                            @click="successGradeUp()"-->
-<!--                                            dark-->
-<!--                                            color="green"-->
-<!--                                            class="custom-card-border ma-2"-->
-<!--                                            elevation="0">-->
-<!--                                        SUCCESS-->
-<!--                                    </v-btn>-->
+                                    <v-dialog v-if="this.isCreatedPromotion" v-model="approveModal" persistent max-width="290">
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn
+                                                    v-on="on"
+                                                    outlined
+                                                    dark
+                                                    color="green"
+                                                    class="custom-card-border ma-2"
+                                                    elevation="0">
+                                                {{ $t('planning_board.promotion_card.promotion.action.success.title') }}
+                                            </v-btn>
+                                        </template>
+                                        <v-card>
+                                            <v-card-title class="title text-break">
+                                                {{
+                                                $t('planning_board.promotion_card.promotion.action.success.modal_question')
+                                                }}
+                                            </v-card-title>
+                                            <v-card-text>
+                                                {{
+                                                $t('planning_board.promotion_card.promotion.action.success.modal_question_hint')
+                                                }}
+                                            </v-card-text>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn color="green darken-1" text @click="approveModal = false">
+                                                    {{
+                                                    $t('planning_board.promotion_card.promotion.action.success.modal_negative_answer')
+                                                    }}
+                                                </v-btn>
+                                                <v-btn color="green darken-1" text @click="successGradeUp()">
+                                                    {{
+                                                    $t('planning_board.promotion_card.promotion.action.success.modal_positive_answer')
+                                                    }}
+                                                </v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
 
                                     <v-btn
                                             outlined
@@ -272,7 +284,7 @@
                                             color="red"
                                             class="custom-card-border ma-2"
                                             elevation="0">
-                                        FAILED
+                                        {{ $t('planning_board.promotion_card.promotion.action.fail') }}
                                     </v-btn>
                                 </div>
                             </v-card-text>
@@ -283,7 +295,9 @@
 
                         <v-card class="ma-4 custom-card-border" outlined v-if="this.previousPromotions.length > 0">
                             <v-toolbar height="40px" color="primary" dense short dark elevation="0">
-                                <v-toolbar-title class="subtitle-2">Previous promotions</v-toolbar-title>
+                                <v-toolbar-title class="subtitle-2">
+                                    {{ $t('planning_board.promotion_card.previous_promotions.title') }}
+                                </v-toolbar-title>
                             </v-toolbar>
 
                             <v-content class="widget-content-height pa-5 overflow-y-auto">
@@ -301,7 +315,7 @@
                                         </span>
                                         <v-spacer/>
                                         <v-chip small label class="font-weight-bold">
-                                            {{prevPromotion.status}}
+                                            {{getLocalizedStatus(prevPromotion.status)}}
                                         </v-chip>
                                     </v-list-item>
 
@@ -411,8 +425,9 @@
 
         public successGradeUp() {
             if (this.promotion) {
-                PromotionAPI.setPromotionStatus(this.promotion.id, 'SUCCESS');
-                this.promotion.status = 'SUCCESS';
+                this.approveModal = false
+                PromotionAPI.setPromotionStatus(this.promotion.id, 'SUCCESSFULLY');
+                this.promotion.status = 'SUCCESSFULLY';
                 this.previousPromotions.unshift(this.promotion);
                 this.clearAllPromotionData();
             }
@@ -435,6 +450,7 @@
             this.promotion.status = 'NOT CREATED';
             this.isModified = false;
             this.isDatesUpdated = false;
+            this.$bus.$emit('clearCalendarData',{});
         }
 
         public createPromotion() {
@@ -525,20 +541,13 @@
             }
         }
 
-        public fetchMemberPromotions(user : IUser|undefined) {
+        public fetchMemberPromotions(user: IUser | undefined) {
             if (user && user.id) {
                 UserEventsAPI.getUserEvents(user.id)
                     .then(response => {
-                        debugger
-                        for (let currentUserEvent in response.data) {
-
-                        }
+                        this.events.push(... response.data)
                     })
             }
-        }
-
-        public eventHighL(): string {
-            return '';
         }
 
         /**
@@ -558,8 +567,8 @@
                     if (createdPromotion) {
                         this.promotion = createdPromotion;
                     }
-                    this.previousPromotions = r.data.filter(p => p.status === 'FAILED' || p.status === 'SUCCESS')
-                    this.previousPromotions.sort((p1,p2) => {
+                    this.previousPromotions = r.data.filter(p => p.status === 'FAILED' || p.status === 'SUCCESSFULLY')
+                    this.previousPromotions.sort((p1, p2) => {
                         return -(new Date(p1.startDate).getTime() - new Date(p2.startDate).getTime())
                     })
 
@@ -581,6 +590,8 @@
                         .filter(u => u.name !== 'SYSTEM' || u.email !== 'system@skillup.com')
                         .filter(u => u.id !== this.selectedUser!.id)
 
+                    debugger
+
                     // set entries into invited users array
                     if (this.promotion.members && this.promotion.members.length > 0) {
                         this.invitedUsers = [];
@@ -597,6 +608,28 @@
                 });
         }
 
+        public getLocalizedStatus(status : string) {
+            switch (status) {
+                case 'CREATED':
+                    return this.$t('planning_board.promotion_card.promotion.status.created');
+                case 'NOT CREATED':
+                    return this.$t('planning_board.promotion_card.promotion.status.not_created');
+                case 'SUCCESSFULLY':
+                    return this.$t('planning_board.promotion_card.promotion.status.successfully');
+                case 'FAILED':
+                    return this.$t('planning_board.promotion_card.promotion.status.failed');
+            }
+        }
+
+        public uniqueElementsBy(arr : any, fn : any) : any[] {
+            if (fn === null) {
+                fn = (a: IEvent, b: IEvent) => a.id === b.id
+            }
+            return arr.reduce((acc: any, v: any) => {
+                if (!acc.some((x: any) => fn(v, x))) acc.push(v);
+                return acc;
+            }, []);
+        }
 
         //  CHECK PROMOTION STATUS
 
@@ -608,18 +641,17 @@
             return this.promotion.status === 'CREATED'
         }
 
-        get isSuccessPromotion(): boolean {
-            return this.promotion.status === 'SUCCESS'
-        }
-
-        get isFailedPromotion(): boolean {
-            return this.promotion.status === 'FAILED'
-        }
-
         // CHECK INVITED USERS CHANGES
-        public updateInvitedUsers() {
+        public updateInvitedUsers(newArray : IUser[]) {
+            debugger
             this.isModified = true;
             this.promotion.members = this.invitedUsers.map(u => u.id)
+
+            this.events = []
+            for (let i = 0; i < newArray.length; i++) {
+                debugger
+                this.fetchMemberPromotions(newArray[i])
+            }
         }
 
     }

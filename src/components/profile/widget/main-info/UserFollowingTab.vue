@@ -8,7 +8,7 @@
                     :key="index" v-for="(following, index) in user.followings"
             >
                 <v-avatar left>
-                    <img :src="following.imageUrl"/>
+                    <img height="24px" width="24px" :src="following.imageUrl"/>
                 </v-avatar>
                 {{following.name}}
             </v-chip>

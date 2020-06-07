@@ -1,0 +1,223 @@
+{
+  "go_to_user_page": "Go to user profile",
+  "management": {
+    "common_tab": {
+      "title": "Common"
+    },
+    "users_tab": {
+      "title": "Users"
+    },
+    "skills_tab": {
+      "title": "Skills"
+    }
+  },
+  "employees_board": {
+    "title": "Employees",
+    "search": {
+      "placeholder": "Search by employee name..."
+    },
+    "pagination": {
+      "items_per_page": "Items per page",
+      "page_number": "Page",
+      "page_count_article": "of"
+    }
+  },
+  "planning_board": {
+    "title": "Planning board",
+    "promotion_title": "{username}'s promotion",
+    "subordinates_list": {
+      "title": "Subordinates",
+      "help_tooltip": "Subordinates whose reached 100% progress"
+    },
+    "promotion_placeholder": "Select subordinate...",
+    "promotion_card": {
+      "action": {
+        "cancel": "cancel",
+        "create": "create",
+        "update": "update"
+      },
+      "promotion": {
+        "status": {
+          "tooltip": "Promotion status",
+          "created": "CREATED",
+          "not_created": "NOT CREATED",
+          "successfully": "SUCCESSFULLY",
+          "failed": "FAILED"
+        },
+        "invited_field": {
+          "title": "Invited",
+          "empty_value": "None",
+          "placeholder": "Enter or select..."
+        },
+        "promotion_date_field": {
+          "error": "Cannot not set event in past!",
+          "title": "Promotion date",
+          "empty_value": "Not set",
+          "starts": "Starts",
+          "ends": "Ends"
+        },
+        "action": {
+          "success": {
+            "title": "SUCCESS",
+            "modal_question": "Approve promotion to next grade?",
+            "modal_question_hint": "You cannot reverse that decision",
+            "modal_positive_answer": "Yes",
+            "modal_negative_answer": "No"
+          },
+          "fail": "FAIL"
+        }
+      },
+      "previous_promotions": {
+        "title": "Previous promotions"
+      }
+    }
+  },
+  "skill_card": {
+    "materials": "Materials",
+    "status": {
+      "not_mandatory": "NOT MANDATORY",
+      "not_mandatory_desc": "Skill not mandatory to know right now",
+      "need_to_know": "NEED TO KNOW",
+      "need_to_know_desc": "Need to learn this skill to get the next grade",
+      "in_progress": "IN PROGRESS",
+      "in_progress_desc": "In progress of learning skill",
+      "pending": "PENDING",
+      "pending_desc": "Mentor need to approve grade or skill",
+      "approved": "APPROVED",
+      "approved_desc": "Approved by mentor",
+      "relearning": "RELEARNING",
+      "relearning_desc": "Skill is relearning"
+    },
+    "action": {
+      "complete": "complete",
+      "learn": "learn",
+      "stop_learning": "stop learning",
+      "reject": "reject",
+      "approve": "approve",
+      "relearn": "relearn"
+    }
+  },
+  "skill": {
+    "name": "Name",
+    "status": "Status",
+    "completion": "Progress",
+    "start_date": "Start date",
+    "end_date": "End date",
+    "grade": "Grade"
+  },
+  "skill_board": {
+    "title": "{username}'s Skill board",
+    "last_review": {
+      "title": "last review",
+      "by_user": "by {username}"
+    },
+    "filter": {
+      "filter_placeholder": "Start typing to filter...",
+      "case_sensitive_filter": {
+        "title": "case sensitive",
+        "tooltip": "Turn on case sensitive filter"
+      },
+      "next_grade_filter": {
+        "title": "next grade",
+        "tooltip": "Show only skills, required for next grade"
+      },
+      "relearn_filter": {
+        "title": "relearn",
+        "tooltip": "Show only skills, that need to be relearned"
+      }
+    },
+    "table_view": "Table view",
+    "choose_skill_placeholder": "Choose skill...",
+    "success_criterion": {
+      "title": "Success criteria"
+    }
+  },
+  "skill_table": {
+    "title": "{username}'s Skill table",
+    "board_view": "Board view",
+    "print": "Print page"
+  },
+  "sidebar": {
+    "point": {
+      "home": "Home",
+      "skill_board": "Skill board",
+      "planning": "Planning",
+      "employees": "Employees",
+      "management": "Management",
+      "settings": "System settings"
+    }
+  },
+  "auth": {
+    "logout": "Logout",
+    "welcome_message": "Welcome!",
+    "login_message": "Please, login to the system",
+    "login_btn": "LOGIN"
+  },
+  "profile": {
+    "settings": {
+      "title": "Profile settings",
+      "privacy": {
+        "title": "Privacy",
+        "visibility": {
+          "on": "Visible profile",
+          "off": "Closed profile",
+          "off_description": "Only important and users from whitelist can see your profile",
+          "whitelist": {
+            "title": "Whitelist users"
+          }
+        }
+      },
+      "language": {
+        "title": "Language"
+      }
+    },
+    "widget": {
+      "avatar": {
+        "action": {
+          "approve_grade": "APPROVE GRADE",
+          "approve_grade_desc": "User get enough progress in current grade, you can approve he's grade up",
+          "follow": "FOLLOW",
+          "unfollow": "UNFOLLOW"
+        }
+      },
+      "grade_progress": {
+        "title": "Grade progress"
+      },
+      "main_info": {
+        "whitelist_action": "Add to whitelist",
+        "skill_board_action": "Review Skill board",
+        "profile_tab": {
+          "title": "Profile",
+          "mentor_field": "Mentor",
+          "promotion_field": "Promotion",
+          "last_promotion_field": "Last promotion",
+          "in_company_since_field": "In company since"
+        },
+        "followers_tab": {
+          "title": "Followers"
+        },
+        "following_tab": {
+          "title": "Following"
+        }
+      },
+      "subordinates": {
+        "title": "Subordinates",
+        "grade_progress_tooltip_desc": "Grade progress"
+      },
+      "activity": {
+        "title": "Activity",
+        "graph_desc": "Skills achieved by user in 12 months",
+        "graph_units": "skill/month",
+        "last_approve_date": "Last approved",
+        "last_pending_date": "Last pending"
+      },
+      "history": {
+        "title": "History of skills"
+      },
+      "timeline": {
+        "title": "Timeline",
+        "first_day": "First day"
+      }
+    }
+  }
+}

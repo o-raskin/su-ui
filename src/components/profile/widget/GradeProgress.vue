@@ -1,7 +1,7 @@
 <template>
     <v-card class="custom-card-border" outlined v-if="skills.length">
         <v-toolbar height="40px" color="primary" dense short dark elevation="0">
-            <v-toolbar-title class="subtitle-2">Grade progress</v-toolbar-title>
+            <v-toolbar-title class="subtitle-2">{{ $t('profile.widget.grade_progress.title') }}</v-toolbar-title>
         </v-toolbar>
 
         <v-content class="widget-content-height pa-1 overflow-y-auto">

@@ -112,7 +112,6 @@
                 SkillsAPI.getUserById(this.user.id)
                     .then(r => {
                         this.skillsUser = r.data
-                        debugger
                     });
             }
         }

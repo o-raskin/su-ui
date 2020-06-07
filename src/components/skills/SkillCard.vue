@@ -46,9 +46,13 @@
                 <v-list-item-content>
 
                     <!--    Name    -->
-                    <v-list-item-title class="headline mb-1">{{skill.name}}</v-list-item-title>
+                    <v-list-item-title style="white-space: normal" class="headline mb-1">
+                        {{skill.name}}
+                    </v-list-item-title>
                     <!--    Description -->
-                    <v-list-item-subtitle>{{skill.description}}</v-list-item-subtitle>
+                    <v-list-item-subtitle style="white-space: normal">
+                        {{skill.description}}
+                    </v-list-item-subtitle>
                 </v-list-item-content>
                 <!--    Avatar  -->
                 <v-avatar class="my-auto" size="70px" tile color="red">
@@ -61,19 +65,20 @@
             <v-divider class="mx-4"></v-divider>
 
             <!--    Materials   -->
-            <v-list-item>
-                <v-list-item-icon>
-                    <v-icon>mdi-cloud-download</v-icon>
-                </v-list-item-icon>
-                <!--                    v-if="skill.materials.length !== 0"-->
-                <template
-                >
-                    <v-list-item-title>Materials</v-list-item-title>
-                    <v-list-item-subtitle>Materials</v-list-item-subtitle>
-                </template>
-            </v-list-item>
+<!--            <v-list-item>-->
+<!--                <v-list-item-icon>-->
+<!--                    <v-icon>mdi-cloud-download</v-icon>-->
+<!--                </v-list-item-icon>-->
+<!--                &lt;!&ndash;                    v-if="skill.materials.length !== 0"&ndash;&gt;-->
+<!--                <template-->
+<!--                >-->
+<!--                    <v-list-item-title>-->
+<!--                        {{ $t('skill_card.materials') }}-->
+<!--                    </v-list-item-title>-->
+<!--                </template>-->
+<!--            </v-list-item>-->
 
-            <v-divider class="mx-4"></v-divider>
+<!--            <v-divider class="mx-4"></v-divider>-->
 
             <!--    Actions -->
             <v-card-actions class="mx-2 my-1">
@@ -87,7 +92,7 @@
                         color="green"
                         class="custom-card-border"
                         elevation="0">
-                    complete
+                    {{ $t('skill_card.action.complete') }}
                 </v-btn>
 
                 <v-btn
@@ -97,7 +102,7 @@
                         color="primary"
                         dark
                         elevation="0">
-                    learn
+                    {{ $t('skill_card.action.learn') }}
                 </v-btn>
 
                 <v-btn
@@ -107,7 +112,7 @@
                         dark
                         color="red"
                         elevation="0">
-                    stop learning
+                    {{ $t('skill_card.action.stop_learning') }}
                 </v-btn>
 
                 <!--    MENTOR ACTIONS    -->
@@ -119,17 +124,17 @@
                         color="red"
                         class="custom-card-border"
                         elevation="0">
-                    REJECT
+                    {{ $t('skill_card.action.reject') }}
                 </v-btn>
 
                 <v-btn
-                        v-if="isWard && isPending"
+                        v-if="isWard && (isPending || isRelearning)"
                         @click="approveSkill()"
                         dark
                         color="green"
                         class="custom-card-border"
                         elevation="0">
-                    APPROVE
+                    {{ $t('skill_card.action.approve') }}
                 </v-btn>
 
                 <v-btn
@@ -139,7 +144,7 @@
                         color="red"
                         class="custom-card-border"
                         elevation="0">
-                    RELEARN
+                    {{ $t('skill_card.action.relearn') }}
                 </v-btn>
 
 
@@ -149,17 +154,13 @@
 
         <v-card outlined class="my-3" v-if="skill.successCriteria !== null && skill.successCriteria.length !== 0">
             <v-toolbar color="primary" dense short dark elevation="0">
-                <v-toolbar-title class="subtitle-2">Success criteria</v-toolbar-title>
+                <v-toolbar-title class="subtitle-2">
+                    {{ $t('skill_board.success_criterion.title') }}
+                </v-toolbar-title>
             </v-toolbar>
 
-            <v-list
-                    outlined
-                    dense
-            >
-                <v-list-item-group
-                        v-model="selectedSuccessCriteria"
-                        multiple
-                >
+            <v-list outlined dense>
+                <v-list-item-group v-model="selectedSuccessCriteria" multiple>
                     <template v-for="(successCriterion, index) in this.skill.successCriteria">
                         <v-list-item :key="successCriterion.name"
                                      v-on:click="successCriterionClick(successCriterion)"
@@ -168,9 +169,9 @@
                         >
                             <template>
                                 <v-list-item-content>
-                                    <v-list-item-title class="subtitle-2"
+                                    <v-list-item-title style="white-space: normal" class="subtitle-2"
                                                        v-text="successCriterion.name"></v-list-item-title>
-                                    <v-list-item-subtitle class="overline"
+                                    <v-list-item-subtitle style="white-space: normal" class="overline"
                                                           v-text="successCriterion.description"></v-list-item-subtitle>
                                 </v-list-item-content>
 
@@ -251,42 +252,53 @@
                 status_list: [
                     {
                         id: 'NOT_MANDATORY',
-                        text: 'NOT MANDATORY',
+                        text: this.getLocalizedMessage('skill_card.status.not_mandatory'),
                         color: 'black',
                         icon: 'mdi-power-off',
-                        tooltipText: 'Skill not mandatory to know right now'
+                        tooltipText: this.getLocalizedMessage('skill_card.status.not_mandatory_desc')
                     },
                     {
                         id: 'NEED_TO_KNOW',
-                        text: 'NEED TO KNOW',
+                        text: this.getLocalizedMessage('skill_card.status.need_to_know'),
                         color: 'red',
                         icon: 'mdi-alert-circle',
-                        tooltipText: 'Need to learn this skill to get the next grade'
+                        tooltipText: this.getLocalizedMessage('skill_card.status.need_to_know_desc')
                     },
                     {
                         id: 'IN_PROGRESS',
-                        text: 'IN PROGRESS',
+                        text: this.getLocalizedMessage('skill_card.status.in_progress'),
                         color: 'primary',
                         icon: 'mdi-dots-horizontal-circle',
-                        tooltipText: 'In progress of learning skill'
+                        tooltipText: this.getLocalizedMessage('skill_card.status.in_progress_desc')
                     },
                     {
                         id: 'PENDING',
-                        text: 'PENDING',
+                        text: this.getLocalizedMessage('skill_card.status.pending'),
                         color: 'orange',
                         icon: 'mdi-help-circle',
-                        tooltipText: 'Mentor need to approve grade or skill'
+                        tooltipText: this.getLocalizedMessage('skill_card.status.pending_desc')
                     },
                     {
                         id: 'APPROVED',
-                        text: 'APPROVED',
+                        text: this.getLocalizedMessage('skill_card.status.approved'),
                         color: 'green',
                         icon: 'mdi-check-circle',
-                        tooltipText: 'Approved by mentor'
+                        tooltipText: this.getLocalizedMessage('skill_card.status.approved_desc')
                     },
+                    {
+                        id: 'RELEARNING',
+                        text: this.getLocalizedMessage('skill_card.status.relearning'),
+                        color: 'red',
+                        icon: 'mdi-cached',
+                        tooltipText: this.getLocalizedMessage('skill_card.status.relearning_desc')
+                    }
                 ],
 
             }
+        }
+
+        public getLocalizedMessage(key : string) {
+            return this.$t(key)
         }
 
         @Watch("user")
@@ -331,11 +343,7 @@
         }
 
         public relearnSkill() {
-            if (this.requiredForGrade) {
-                this.userSkillData.status = 'NEED_TO_KNOW'
-            } else {
-                this.userSkillData.status = 'NOT_MANDATORY'
-            }
+            this.userSkillData.status = 'RELEARNING';
             this.userSkillData.endDate = null;
             this.userSkillData.editorId = this.currentUser.id;
             this.userSkillData.lastEditDate = new Date().toISOString().slice(0, 10);
@@ -407,7 +415,6 @@
                 }
             }
 
-            debugger
             SuccessCriterionAPI.updateUserSuccessCriterion(userSuccessCriterion)
                 .then(r => {
                     let oldSCIndex = this.userSuccessCriteriaData
@@ -438,6 +445,10 @@
             return this.userSkillData.status === 'APPROVED';
         }
 
+        get isRelearning(): boolean {
+            return this.userSkillData.status === 'RELEARNING';
+        }
+
         //  CHECKS
 
         get isWard(): boolean {
@@ -449,7 +460,7 @@
         }
 
         get canBeLearned(): boolean {
-            return !this.isPending && !this.isApproved && !this.isInProgress;
+            return !this.isPending && !this.isApproved && !this.isInProgress && !this.isRelearning;
         }
 
         get isReadyToComplete(): boolean {
@@ -471,7 +482,6 @@
         //  OTHER
 
         get skillGradeName() {
-            debugger
             let skillGrade = this.grades.find(g => g.id === this.skill.gradeId);
             if (!!skillGrade) {
                 return skillGrade.name.toUpperCase();

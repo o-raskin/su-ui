@@ -1,7 +1,15 @@
 <template>
-    <v-card class="pa-3">
+    <v-container>
+        <v-toolbar dense short flat>
+            <v-toolbar-title class="pl-0">
+                {{ $t('employees_board.title') }}
+            </v-toolbar-title>
+        </v-toolbar>
+
+        <v-divider class="mb-3"/>
+
         <v-data-iterator
-                :items="profiles"
+                :items="users"
                 :items-per-page.sync="itemsPerPage"
                 :page="page"
                 :search="search"
@@ -20,10 +28,21 @@
                             flat
                             solo-inverted
                             hide-details
-                            label="Search"
-                    />
+                            :label="getLocalizedMessage('employees_board.search.placeholder')"
+                    ></v-text-field>
+
                     <template v-if="$vuetify.breakpoint.mdAndUp">
                         <v-spacer></v-spacer>
+
+                        <!--                        <v-select-->
+                        <!--                                v-model="sortBy"-->
+                        <!--                                flat-->
+                        <!--                                solo-inverted-->
+                        <!--                                hide-details-->
+                        <!--                                :items="keys"-->
+                        <!--                                prepend-inner-icon="mdi-filter"-->
+                        <!--                                label="Sort by"-->
+                        <!--                        ></v-select>-->
                     </template>
                 </v-toolbar>
             </template>
@@ -32,17 +51,17 @@
                 <v-row>
                     <v-col
                             v-for="item in props.items"
-                            :key="item.user.id"
+                            :key="item.id"
                             cols="12"
                             sm="6"
                             md="4"
                             lg="3"
                     >
-                        <v-card @click="goToUserProfile(item.user.id)">
+                        <v-card @click="goToUserProfile(item.id)">
 
                             <v-list-item>
                                 <v-list-item-content>
-                                    <v-list-item-title class="subtitle-1 mb-1">{{ item.user.name }}</v-list-item-title>
+                                    <v-list-item-title class="subtitle-1 mb-1">{{ item.name }}</v-list-item-title>
                                 </v-list-item-content>
 
                                 <v-list-item-avatar
@@ -50,7 +69,7 @@
                                         class="custom-card-border"
                                         size="80"
                                 >
-                                    <v-img :src="item.user.imageUrl"></v-img>
+                                    <v-img :src="item.imageUrl"></v-img>
                                 </v-list-item-avatar>
                             </v-list-item>
 
@@ -62,7 +81,9 @@
             <template v-slot:footer>
 
                 <v-row class="mt-2" align="center" justify="center">
-                    <span class="grey--text">Items per page</span>
+                    <span class="grey--text">
+                        {{ $t('employees_board.pagination.items_per_page') }}
+                    </span>
                     <v-menu offset-y>
                         <template v-slot:activator="{ on }">
                             <v-btn
@@ -87,10 +108,13 @@
                         </v-list>
                     </v-menu>
 
-<!--                    <v-spacer></v-spacer>-->
+                    <!--                    <v-spacer></v-spacer>-->
 
                     <span class="mr-4 grey--text">
-                        Page {{ page }} of {{ numberOfPages }}
+                        {{ $t('employees_board.pagination.page_number') }}
+                        {{ page }}
+                        {{ $t('employees_board.pagination.page_count_article') }}
+                        {{ numberOfPages }}
                     </span>
 
                     <v-btn
@@ -113,7 +137,8 @@
                 </v-row>
             </template>
         </v-data-iterator>
-    </v-card>
+
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -123,6 +148,7 @@
     import {ProfileAPI} from "@/api/ProfileAPI";
     import {State} from "vuex-class";
     import {IUser} from "@/models/User";
+    import {UserAPI} from "@/api/UserAPI";
 
     @Component
     export default class ProfilesBoard extends Vue {
@@ -130,7 +156,7 @@
         @State((state) => state.currentUser)
         public readonly currentUser!: IUser;
 
-        public profiles: IProfile[] = [];
+        public users: IUser[] = [];
 
         public search: string = '';
 
@@ -142,16 +168,16 @@
 
         public sortDesc: boolean = false;
 
-        public itemsPerPage: number = 4;
+        public itemsPerPage: number = 16;
 
-        public sortBy: string = 'Name';
+        public sortBy: string = 'name';
 
         public keys: string[] = [
             'Name',
         ];
 
         get numberOfPages(): number {
-            return Math.ceil(this.profiles.length / this.itemsPerPage)
+            return Math.ceil(this.users.length / this.itemsPerPage)
         }
 
         public nextPage() {
@@ -166,10 +192,25 @@
             this.itemsPerPage = num
         }
 
+        public getLocalizedMessage(key: string) {
+            return this.$t(key)
+        }
+
         mounted() {
-            ProfileAPI.getAllActiveProfiles()
+            UserAPI.getAllUsers()
                 .then((res) => {
-                    this.profiles = res.data;
+                    for (let i = 0; i < res.data.length; i++) {
+                        if (res.data[i].position) {
+                            // @ts-ignore
+                            res.data[i].position = res.data[i].position.name;
+                        }
+                        // if (res.data[i].mentor) {
+                        //     // @ts-ignore
+                        //     res.data[i].mentor = res.data[i].mentor.name;
+                        // }
+                    }
+
+                    this.users = res.data
                 })
                 .catch((error) => {
                     this.$router.push({path: '/404'})

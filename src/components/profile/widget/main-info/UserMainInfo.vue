@@ -20,7 +20,7 @@
                                     </v-icon>
                                 </v-btn>
                             </template>
-                            <span>Add to whitelist</span>
+                            <span>{{ $t('profile.widget.main_info.whitelist_action') }}</span>
                         </v-tooltip>
                     </div>
 
@@ -37,7 +37,7 @@
                                     </v-icon>
                                 </v-btn>
                             </template>
-                            <span>Review Skill board</span>
+                            <span>{{ $t('profile.widget.main_info.skill_board_action') }}</span>
                         </v-tooltip>
                     </div>
 
@@ -91,13 +91,13 @@
                     <v-tabs-slider></v-tabs-slider>
 
                     <v-tab>
-                        Profile
+                        {{ $t('profile.widget.main_info.profile_tab.title') }}
                     </v-tab>
                     <v-tab>
-                        Followers
+                        {{ $t('profile.widget.main_info.followers_tab.title') }}
                     </v-tab>
                     <v-tab>
-                        Following
+                        {{ $t('profile.widget.main_info.following_tab.title') }}
                     </v-tab>
                     <v-tab-item>
                         <UserProfileTab :profile="profile"

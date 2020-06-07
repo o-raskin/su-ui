@@ -5,6 +5,7 @@ import vuetify from './plugins/vuetify';
 import EventBus from 'vue-bus-ts';
 import moment from 'moment'
 import VueRouter from "vue-router";
+import i18n from './i18n'
 
 
 Vue.config.productionTip = false
@@ -53,5 +54,6 @@ new Vue({
     store,
     vuetify,
     bus,
+    i18n,
     render: h => h(App)
 }).$mount('#app')

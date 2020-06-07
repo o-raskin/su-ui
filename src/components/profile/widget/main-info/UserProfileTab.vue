@@ -3,31 +3,31 @@
 
         <v-card-text>
             <span v-if="!!this.user.mentor" class="text--secondary">
-                {{mentor_text + ': '}}
+                {{ $t('profile.widget.main_info.profile_tab.mentor_field') + ': '}}
                 <a class="link" @click="goToMentorProfile">
                     {{this.user.mentor.name}}
                 </a>
                 <br/>
             </span>
 
-            <span v-if="!!this.user.futurePromotionDate" class="text--secondary">
-                {{user_future_promotion_text + ': ' }}
+            <span v-if="!!this.promotionDate && this.promotionDate !== ''" class="text--secondary">
+                {{ $t('profile.widget.main_info.profile_tab.promotion_field') + ': ' }}
                 <span class="text--primary">
-                    {{ this.user.futurePromotionDate | formatDate }}
+                    {{ this.promotionDate | formatDateTime }}
                 </span>
                 <br/>
             </span>
 
-            <span v-if="!!this.user.lastPromotionDate" class="text--secondary">
-                {{user_last_promotion_text + ': '}}
+            <span v-if="!!this.lastPromotionDate && this.lastPromotionDate !== ''" class="text--secondary">
+                {{ $t('profile.widget.main_info.profile_tab.last_promotion_field') + ': '}}
                 <span class="text--primary">
-                    {{ this.user.lastPromotionDate | formatDate }}
+                    {{ this.lastPromotionDate | formatDateTime }}
                 </span>
                 <br/>
             </span>
 
             <span v-if="!!this.user.inCompanySince" class="text--secondary">
-                {{user_in_company_text + ': '}}
+                {{ $t('profile.widget.main_info.profile_tab.in_company_since_field') + ': '}}
                 <span class="text--primary">
                     {{this.user.inCompanySince | formatDate }}
                 </span>
@@ -41,6 +41,7 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {IUser} from "@/models/User";
     import {IProfile} from "@/models/Profile";
+    import {PromotionAPI} from "@/api/PromotionAPI";
 
     @Component({
         components: {},
@@ -53,6 +54,9 @@
         @Prop()
         public readonly profile!: IProfile;
 
+        public promotionDate: Date | string = '';
+        public lastPromotionDate: Date | string = '';
+
         public goToMentorProfile() {
             this.$router.push({
                 name: 'UserProfile',
@@ -63,13 +67,26 @@
             });
         }
 
-        data() {
-            return {
-                mentor_text: 'Mentor',
-                user_future_promotion_text: 'Promotion',
-                user_last_promotion_text: 'Last promotion',
-                user_in_company_text: 'In company since',
-            }
+        mounted() {
+            this.fetchPromotionData();
+        }
+
+        public fetchPromotionData() {
+            PromotionAPI.getAllPromotionsByUserId(this.user.id)
+                .then(r => {
+                    let promotion = r.data.filter(p => p.status === 'CREATED')[0];
+                    if (promotion && promotion.startDate) {
+                        this.promotionDate = promotion.startDate
+                    }
+
+                    let prevPromotions = r.data
+                        .filter(p => p.status !== 'CREATED')
+                        .sort((p1, p2) => {
+                            return -(new Date(p1.startDate).getTime() - new Date(p2.startDate).getTime())
+                        });
+                    this.lastPromotionDate = prevPromotions[0].startDate
+                    debugger
+                });
         }
     }
 </script>
